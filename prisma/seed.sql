@@ -1,9 +1,9 @@
 -- Insert test users
 INSERT INTO "User" (email, password, fullname, is_admin, created_at, updated_at) VALUES
-('admin@example.com', '$2b$10$K7L1OJ45/4Y2nIvhRVpCe.FSmhDdWoXehVzJptJ/op0lSsvqNuWkm', 'Admin User', true, NOW(), NOW()),
-('john@example.com', '$2b$10$K7L1OJ45/4Y2nIvhRVpCe.FSmhDdWoXehVzJptJ/op0lSsvqNuWkm', 'John Doe', false, NOW(), NOW()),
-('jane@example.com', '$2b$10$K7L1OJ45/4Y2nIvhRVpCe.FSmhDdWoXehVzJptJ/op0lSsvqNuWkm', 'Jane Smith', false, NOW(), NOW()),
-('bob@example.com', '$2b$10$K7L1OJ45/4Y2nIvhRVpCe.FSmhDdWoXehVzJptJ/op0lSsvqNuWkm', 'Bob Johnson', false, NOW(), NOW());
+('admin@example.com', '$2a$12$QpVfF0oxVJN46Z/U4gyIXOghy/ehV7Sjs8L0Azq/UErVhYC/qsv8C', 'Admin User', true, NOW(), NOW()),
+('john@example.com', '$2a$12$QpVfF0oxVJN46Z/U4gyIXOghy/ehV7Sjs8L0Azq/UErVhYC/qsv8C', 'John Doe', false, NOW(), NOW()),
+('jane@example.com', '$2a$12$QpVfF0oxVJN46Z/U4gyIXOghy/ehV7Sjs8L0Azq/UErVhYC/qsv8C', 'Jane Smith', false, NOW(), NOW()),
+('bob@example.com', '$2a$12$QpVfF0oxVJN46Z/U4gyIXOghy/ehV7Sjs8L0Azq/UErVhYC/qsv8C', 'Bob Johnson', false, NOW(), NOW());
 
 -- Insert test contributions for the last 6 months
 WITH RECURSIVE months AS (
