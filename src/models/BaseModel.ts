@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client/edge'
 
 let prisma: PrismaClient;
 
@@ -79,6 +79,6 @@ export abstract class BaseModel<T, CreateInput, UpdateInput> {
 
   // Utility methods
   protected getPrismaModel() {
-    return this.prisma[this.modelName];
+    return this.prisma[this.modelName] as any;
   }
 } 
