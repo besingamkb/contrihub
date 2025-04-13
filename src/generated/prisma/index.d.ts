@@ -18,6 +18,29 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  * 
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
+/**
+ * Model Contribution
+ * 
+ */
+export type Contribution = $Result.DefaultSelection<Prisma.$ContributionPayload>
+
+/**
+ * Enums
+ */
+export namespace $Enums {
+  export const Status: {
+  PENDING: 'PENDING',
+  PAID: 'PAID',
+  MISSED: 'MISSED'
+};
+
+export type Status = (typeof Status)[keyof typeof Status]
+
+}
+
+export type Status = $Enums.Status
+
+export const Status: typeof $Enums.Status
 
 /**
  * ##  Prisma Client ʲˢ
@@ -153,6 +176,16 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.contribution`: Exposes CRUD operations for the **Contribution** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Contributions
+    * const contributions = await prisma.contribution.findMany()
+    * ```
+    */
+  get contribution(): Prisma.ContributionDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -593,7 +626,8 @@ export namespace Prisma {
 
 
   export const ModelName: {
-    User: 'User'
+    User: 'User',
+    Contribution: 'Contribution'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -612,7 +646,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user"
+      modelProps: "user" | "contribution"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -687,6 +721,80 @@ export namespace Prisma {
           count: {
             args: Prisma.UserCountArgs<ExtArgs>
             result: $Utils.Optional<UserCountAggregateOutputType> | number
+          }
+        }
+      }
+      Contribution: {
+        payload: Prisma.$ContributionPayload<ExtArgs>
+        fields: Prisma.ContributionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ContributionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContributionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ContributionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContributionPayload>
+          }
+          findFirst: {
+            args: Prisma.ContributionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContributionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ContributionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContributionPayload>
+          }
+          findMany: {
+            args: Prisma.ContributionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContributionPayload>[]
+          }
+          create: {
+            args: Prisma.ContributionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContributionPayload>
+          }
+          createMany: {
+            args: Prisma.ContributionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ContributionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContributionPayload>[]
+          }
+          delete: {
+            args: Prisma.ContributionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContributionPayload>
+          }
+          update: {
+            args: Prisma.ContributionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContributionPayload>
+          }
+          deleteMany: {
+            args: Prisma.ContributionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ContributionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ContributionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContributionPayload>[]
+          }
+          upsert: {
+            args: Prisma.ContributionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContributionPayload>
+          }
+          aggregate: {
+            args: Prisma.ContributionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateContribution>
+          }
+          groupBy: {
+            args: Prisma.ContributionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ContributionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ContributionCountArgs<ExtArgs>
+            result: $Utils.Optional<ContributionCountAggregateOutputType> | number
           }
         }
       }
@@ -775,6 +883,7 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     user?: UserOmit
+    contribution?: ContributionOmit
   }
 
   /* Types for Logging */
@@ -863,6 +972,36 @@ export namespace Prisma {
    * Count Types
    */
 
+
+  /**
+   * Count Type UserCountOutputType
+   */
+
+  export type UserCountOutputType = {
+    contributions: number
+  }
+
+  export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    contributions?: boolean | UserCountOutputTypeCountContributionsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserCountOutputType
+     */
+    select?: UserCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountContributionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContributionWhereInput
+  }
 
 
   /**
@@ -1083,6 +1222,8 @@ export namespace Prisma {
     is_admin?: boolean
     created_at?: boolean
     updated_at?: boolean
+    contributions?: boolean | User$contributionsArgs<ExtArgs>
+    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1116,10 +1257,18 @@ export namespace Prisma {
   }
 
   export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "fullname" | "email" | "password" | "is_admin" | "created_at" | "updated_at", ExtArgs["result"]["user"]>
+  export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    contributions?: boolean | User$contributionsArgs<ExtArgs>
+    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type UserIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
-    objects: {}
+    objects: {
+      contributions: Prisma.$ContributionPayload<ExtArgs>[]
+    }
     scalars: $Extensions.GetPayloadResult<{
       id: number
       fullname: string
@@ -1522,6 +1671,7 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    contributions<T extends User$contributionsArgs<ExtArgs> = {}>(args?: Subset<T, User$contributionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContributionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1575,6 +1725,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter, which User to fetch.
      */
     where: UserWhereUniqueInput
@@ -1593,6 +1747,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter, which User to fetch.
      */
     where: UserWhereUniqueInput
@@ -1610,6 +1768,10 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
     /**
      * Filter, which User to fetch.
      */
@@ -1659,6 +1821,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter, which User to fetch.
      */
     where?: UserWhereInput
@@ -1707,6 +1873,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter, which Users to fetch.
      */
     where?: UserWhereInput
@@ -1749,6 +1919,10 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
     /**
      * The data needed to create a User.
      */
@@ -1797,6 +1971,10 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
     /**
      * The data needed to update a User.
      */
@@ -1864,6 +2042,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * The filter to search for the User to update in case it exists.
      */
     where: UserWhereUniqueInput
@@ -1890,6 +2072,10 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    /**
      * Filter which User to delete.
      */
     where: UserWhereUniqueInput
@@ -1910,6 +2096,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.contributions
+   */
+  export type User$contributionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contribution
+     */
+    select?: ContributionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contribution
+     */
+    omit?: ContributionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContributionInclude<ExtArgs> | null
+    where?: ContributionWhereInput
+    orderBy?: ContributionOrderByWithRelationInput | ContributionOrderByWithRelationInput[]
+    cursor?: ContributionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ContributionScalarFieldEnum | ContributionScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1921,6 +2131,1149 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model Contribution
+   */
+
+  export type AggregateContribution = {
+    _count: ContributionCountAggregateOutputType | null
+    _avg: ContributionAvgAggregateOutputType | null
+    _sum: ContributionSumAggregateOutputType | null
+    _min: ContributionMinAggregateOutputType | null
+    _max: ContributionMaxAggregateOutputType | null
+  }
+
+  export type ContributionAvgAggregateOutputType = {
+    id: number | null
+    user_id: number | null
+    amount: Decimal | null
+  }
+
+  export type ContributionSumAggregateOutputType = {
+    id: number | null
+    user_id: number | null
+    amount: Decimal | null
+  }
+
+  export type ContributionMinAggregateOutputType = {
+    id: number | null
+    user_id: number | null
+    amount: Decimal | null
+    month: Date | null
+    status: $Enums.Status | null
+    notes: string | null
+    created_at: Date | null
+    updated_at: Date | null
+  }
+
+  export type ContributionMaxAggregateOutputType = {
+    id: number | null
+    user_id: number | null
+    amount: Decimal | null
+    month: Date | null
+    status: $Enums.Status | null
+    notes: string | null
+    created_at: Date | null
+    updated_at: Date | null
+  }
+
+  export type ContributionCountAggregateOutputType = {
+    id: number
+    user_id: number
+    amount: number
+    month: number
+    status: number
+    notes: number
+    created_at: number
+    updated_at: number
+    _all: number
+  }
+
+
+  export type ContributionAvgAggregateInputType = {
+    id?: true
+    user_id?: true
+    amount?: true
+  }
+
+  export type ContributionSumAggregateInputType = {
+    id?: true
+    user_id?: true
+    amount?: true
+  }
+
+  export type ContributionMinAggregateInputType = {
+    id?: true
+    user_id?: true
+    amount?: true
+    month?: true
+    status?: true
+    notes?: true
+    created_at?: true
+    updated_at?: true
+  }
+
+  export type ContributionMaxAggregateInputType = {
+    id?: true
+    user_id?: true
+    amount?: true
+    month?: true
+    status?: true
+    notes?: true
+    created_at?: true
+    updated_at?: true
+  }
+
+  export type ContributionCountAggregateInputType = {
+    id?: true
+    user_id?: true
+    amount?: true
+    month?: true
+    status?: true
+    notes?: true
+    created_at?: true
+    updated_at?: true
+    _all?: true
+  }
+
+  export type ContributionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Contribution to aggregate.
+     */
+    where?: ContributionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Contributions to fetch.
+     */
+    orderBy?: ContributionOrderByWithRelationInput | ContributionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ContributionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Contributions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Contributions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Contributions
+    **/
+    _count?: true | ContributionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ContributionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ContributionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ContributionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ContributionMaxAggregateInputType
+  }
+
+  export type GetContributionAggregateType<T extends ContributionAggregateArgs> = {
+        [P in keyof T & keyof AggregateContribution]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateContribution[P]>
+      : GetScalarType<T[P], AggregateContribution[P]>
+  }
+
+
+
+
+  export type ContributionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContributionWhereInput
+    orderBy?: ContributionOrderByWithAggregationInput | ContributionOrderByWithAggregationInput[]
+    by: ContributionScalarFieldEnum[] | ContributionScalarFieldEnum
+    having?: ContributionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ContributionCountAggregateInputType | true
+    _avg?: ContributionAvgAggregateInputType
+    _sum?: ContributionSumAggregateInputType
+    _min?: ContributionMinAggregateInputType
+    _max?: ContributionMaxAggregateInputType
+  }
+
+  export type ContributionGroupByOutputType = {
+    id: number
+    user_id: number
+    amount: Decimal
+    month: Date
+    status: $Enums.Status
+    notes: string | null
+    created_at: Date
+    updated_at: Date
+    _count: ContributionCountAggregateOutputType | null
+    _avg: ContributionAvgAggregateOutputType | null
+    _sum: ContributionSumAggregateOutputType | null
+    _min: ContributionMinAggregateOutputType | null
+    _max: ContributionMaxAggregateOutputType | null
+  }
+
+  type GetContributionGroupByPayload<T extends ContributionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ContributionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ContributionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ContributionGroupByOutputType[P]>
+            : GetScalarType<T[P], ContributionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ContributionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    user_id?: boolean
+    amount?: boolean
+    month?: boolean
+    status?: boolean
+    notes?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["contribution"]>
+
+  export type ContributionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    user_id?: boolean
+    amount?: boolean
+    month?: boolean
+    status?: boolean
+    notes?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["contribution"]>
+
+  export type ContributionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    user_id?: boolean
+    amount?: boolean
+    month?: boolean
+    status?: boolean
+    notes?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["contribution"]>
+
+  export type ContributionSelectScalar = {
+    id?: boolean
+    user_id?: boolean
+    amount?: boolean
+    month?: boolean
+    status?: boolean
+    notes?: boolean
+    created_at?: boolean
+    updated_at?: boolean
+  }
+
+  export type ContributionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "user_id" | "amount" | "month" | "status" | "notes" | "created_at" | "updated_at", ExtArgs["result"]["contribution"]>
+  export type ContributionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ContributionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ContributionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $ContributionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Contribution"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: number
+      user_id: number
+      amount: Prisma.Decimal
+      month: Date
+      status: $Enums.Status
+      notes: string | null
+      created_at: Date
+      updated_at: Date
+    }, ExtArgs["result"]["contribution"]>
+    composites: {}
+  }
+
+  type ContributionGetPayload<S extends boolean | null | undefined | ContributionDefaultArgs> = $Result.GetResult<Prisma.$ContributionPayload, S>
+
+  type ContributionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ContributionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ContributionCountAggregateInputType | true
+    }
+
+  export interface ContributionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Contribution'], meta: { name: 'Contribution' } }
+    /**
+     * Find zero or one Contribution that matches the filter.
+     * @param {ContributionFindUniqueArgs} args - Arguments to find a Contribution
+     * @example
+     * // Get one Contribution
+     * const contribution = await prisma.contribution.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ContributionFindUniqueArgs>(args: SelectSubset<T, ContributionFindUniqueArgs<ExtArgs>>): Prisma__ContributionClient<$Result.GetResult<Prisma.$ContributionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Contribution that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ContributionFindUniqueOrThrowArgs} args - Arguments to find a Contribution
+     * @example
+     * // Get one Contribution
+     * const contribution = await prisma.contribution.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ContributionFindUniqueOrThrowArgs>(args: SelectSubset<T, ContributionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ContributionClient<$Result.GetResult<Prisma.$ContributionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Contribution that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContributionFindFirstArgs} args - Arguments to find a Contribution
+     * @example
+     * // Get one Contribution
+     * const contribution = await prisma.contribution.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ContributionFindFirstArgs>(args?: SelectSubset<T, ContributionFindFirstArgs<ExtArgs>>): Prisma__ContributionClient<$Result.GetResult<Prisma.$ContributionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Contribution that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContributionFindFirstOrThrowArgs} args - Arguments to find a Contribution
+     * @example
+     * // Get one Contribution
+     * const contribution = await prisma.contribution.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ContributionFindFirstOrThrowArgs>(args?: SelectSubset<T, ContributionFindFirstOrThrowArgs<ExtArgs>>): Prisma__ContributionClient<$Result.GetResult<Prisma.$ContributionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Contributions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContributionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Contributions
+     * const contributions = await prisma.contribution.findMany()
+     * 
+     * // Get first 10 Contributions
+     * const contributions = await prisma.contribution.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const contributionWithIdOnly = await prisma.contribution.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ContributionFindManyArgs>(args?: SelectSubset<T, ContributionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContributionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Contribution.
+     * @param {ContributionCreateArgs} args - Arguments to create a Contribution.
+     * @example
+     * // Create one Contribution
+     * const Contribution = await prisma.contribution.create({
+     *   data: {
+     *     // ... data to create a Contribution
+     *   }
+     * })
+     * 
+     */
+    create<T extends ContributionCreateArgs>(args: SelectSubset<T, ContributionCreateArgs<ExtArgs>>): Prisma__ContributionClient<$Result.GetResult<Prisma.$ContributionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Contributions.
+     * @param {ContributionCreateManyArgs} args - Arguments to create many Contributions.
+     * @example
+     * // Create many Contributions
+     * const contribution = await prisma.contribution.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ContributionCreateManyArgs>(args?: SelectSubset<T, ContributionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Contributions and returns the data saved in the database.
+     * @param {ContributionCreateManyAndReturnArgs} args - Arguments to create many Contributions.
+     * @example
+     * // Create many Contributions
+     * const contribution = await prisma.contribution.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Contributions and only return the `id`
+     * const contributionWithIdOnly = await prisma.contribution.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ContributionCreateManyAndReturnArgs>(args?: SelectSubset<T, ContributionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContributionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Contribution.
+     * @param {ContributionDeleteArgs} args - Arguments to delete one Contribution.
+     * @example
+     * // Delete one Contribution
+     * const Contribution = await prisma.contribution.delete({
+     *   where: {
+     *     // ... filter to delete one Contribution
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ContributionDeleteArgs>(args: SelectSubset<T, ContributionDeleteArgs<ExtArgs>>): Prisma__ContributionClient<$Result.GetResult<Prisma.$ContributionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Contribution.
+     * @param {ContributionUpdateArgs} args - Arguments to update one Contribution.
+     * @example
+     * // Update one Contribution
+     * const contribution = await prisma.contribution.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ContributionUpdateArgs>(args: SelectSubset<T, ContributionUpdateArgs<ExtArgs>>): Prisma__ContributionClient<$Result.GetResult<Prisma.$ContributionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Contributions.
+     * @param {ContributionDeleteManyArgs} args - Arguments to filter Contributions to delete.
+     * @example
+     * // Delete a few Contributions
+     * const { count } = await prisma.contribution.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ContributionDeleteManyArgs>(args?: SelectSubset<T, ContributionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Contributions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContributionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Contributions
+     * const contribution = await prisma.contribution.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ContributionUpdateManyArgs>(args: SelectSubset<T, ContributionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Contributions and returns the data updated in the database.
+     * @param {ContributionUpdateManyAndReturnArgs} args - Arguments to update many Contributions.
+     * @example
+     * // Update many Contributions
+     * const contribution = await prisma.contribution.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Contributions and only return the `id`
+     * const contributionWithIdOnly = await prisma.contribution.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ContributionUpdateManyAndReturnArgs>(args: SelectSubset<T, ContributionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContributionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Contribution.
+     * @param {ContributionUpsertArgs} args - Arguments to update or create a Contribution.
+     * @example
+     * // Update or create a Contribution
+     * const contribution = await prisma.contribution.upsert({
+     *   create: {
+     *     // ... data to create a Contribution
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Contribution we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ContributionUpsertArgs>(args: SelectSubset<T, ContributionUpsertArgs<ExtArgs>>): Prisma__ContributionClient<$Result.GetResult<Prisma.$ContributionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Contributions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContributionCountArgs} args - Arguments to filter Contributions to count.
+     * @example
+     * // Count the number of Contributions
+     * const count = await prisma.contribution.count({
+     *   where: {
+     *     // ... the filter for the Contributions we want to count
+     *   }
+     * })
+    **/
+    count<T extends ContributionCountArgs>(
+      args?: Subset<T, ContributionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ContributionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Contribution.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContributionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ContributionAggregateArgs>(args: Subset<T, ContributionAggregateArgs>): Prisma.PrismaPromise<GetContributionAggregateType<T>>
+
+    /**
+     * Group by Contribution.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContributionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ContributionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ContributionGroupByArgs['orderBy'] }
+        : { orderBy?: ContributionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ContributionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetContributionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Contribution model
+   */
+  readonly fields: ContributionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Contribution.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ContributionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Contribution model
+   */
+  interface ContributionFieldRefs {
+    readonly id: FieldRef<"Contribution", 'Int'>
+    readonly user_id: FieldRef<"Contribution", 'Int'>
+    readonly amount: FieldRef<"Contribution", 'Decimal'>
+    readonly month: FieldRef<"Contribution", 'DateTime'>
+    readonly status: FieldRef<"Contribution", 'Status'>
+    readonly notes: FieldRef<"Contribution", 'String'>
+    readonly created_at: FieldRef<"Contribution", 'DateTime'>
+    readonly updated_at: FieldRef<"Contribution", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Contribution findUnique
+   */
+  export type ContributionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contribution
+     */
+    select?: ContributionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contribution
+     */
+    omit?: ContributionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContributionInclude<ExtArgs> | null
+    /**
+     * Filter, which Contribution to fetch.
+     */
+    where: ContributionWhereUniqueInput
+  }
+
+  /**
+   * Contribution findUniqueOrThrow
+   */
+  export type ContributionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contribution
+     */
+    select?: ContributionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contribution
+     */
+    omit?: ContributionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContributionInclude<ExtArgs> | null
+    /**
+     * Filter, which Contribution to fetch.
+     */
+    where: ContributionWhereUniqueInput
+  }
+
+  /**
+   * Contribution findFirst
+   */
+  export type ContributionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contribution
+     */
+    select?: ContributionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contribution
+     */
+    omit?: ContributionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContributionInclude<ExtArgs> | null
+    /**
+     * Filter, which Contribution to fetch.
+     */
+    where?: ContributionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Contributions to fetch.
+     */
+    orderBy?: ContributionOrderByWithRelationInput | ContributionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Contributions.
+     */
+    cursor?: ContributionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Contributions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Contributions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Contributions.
+     */
+    distinct?: ContributionScalarFieldEnum | ContributionScalarFieldEnum[]
+  }
+
+  /**
+   * Contribution findFirstOrThrow
+   */
+  export type ContributionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contribution
+     */
+    select?: ContributionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contribution
+     */
+    omit?: ContributionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContributionInclude<ExtArgs> | null
+    /**
+     * Filter, which Contribution to fetch.
+     */
+    where?: ContributionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Contributions to fetch.
+     */
+    orderBy?: ContributionOrderByWithRelationInput | ContributionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Contributions.
+     */
+    cursor?: ContributionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Contributions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Contributions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Contributions.
+     */
+    distinct?: ContributionScalarFieldEnum | ContributionScalarFieldEnum[]
+  }
+
+  /**
+   * Contribution findMany
+   */
+  export type ContributionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contribution
+     */
+    select?: ContributionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contribution
+     */
+    omit?: ContributionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContributionInclude<ExtArgs> | null
+    /**
+     * Filter, which Contributions to fetch.
+     */
+    where?: ContributionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Contributions to fetch.
+     */
+    orderBy?: ContributionOrderByWithRelationInput | ContributionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Contributions.
+     */
+    cursor?: ContributionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Contributions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Contributions.
+     */
+    skip?: number
+    distinct?: ContributionScalarFieldEnum | ContributionScalarFieldEnum[]
+  }
+
+  /**
+   * Contribution create
+   */
+  export type ContributionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contribution
+     */
+    select?: ContributionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contribution
+     */
+    omit?: ContributionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContributionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Contribution.
+     */
+    data: XOR<ContributionCreateInput, ContributionUncheckedCreateInput>
+  }
+
+  /**
+   * Contribution createMany
+   */
+  export type ContributionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Contributions.
+     */
+    data: ContributionCreateManyInput | ContributionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Contribution createManyAndReturn
+   */
+  export type ContributionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contribution
+     */
+    select?: ContributionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contribution
+     */
+    omit?: ContributionOmit<ExtArgs> | null
+    /**
+     * The data used to create many Contributions.
+     */
+    data: ContributionCreateManyInput | ContributionCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContributionIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Contribution update
+   */
+  export type ContributionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contribution
+     */
+    select?: ContributionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contribution
+     */
+    omit?: ContributionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContributionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Contribution.
+     */
+    data: XOR<ContributionUpdateInput, ContributionUncheckedUpdateInput>
+    /**
+     * Choose, which Contribution to update.
+     */
+    where: ContributionWhereUniqueInput
+  }
+
+  /**
+   * Contribution updateMany
+   */
+  export type ContributionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Contributions.
+     */
+    data: XOR<ContributionUpdateManyMutationInput, ContributionUncheckedUpdateManyInput>
+    /**
+     * Filter which Contributions to update
+     */
+    where?: ContributionWhereInput
+    /**
+     * Limit how many Contributions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Contribution updateManyAndReturn
+   */
+  export type ContributionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contribution
+     */
+    select?: ContributionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contribution
+     */
+    omit?: ContributionOmit<ExtArgs> | null
+    /**
+     * The data used to update Contributions.
+     */
+    data: XOR<ContributionUpdateManyMutationInput, ContributionUncheckedUpdateManyInput>
+    /**
+     * Filter which Contributions to update
+     */
+    where?: ContributionWhereInput
+    /**
+     * Limit how many Contributions to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContributionIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Contribution upsert
+   */
+  export type ContributionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contribution
+     */
+    select?: ContributionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contribution
+     */
+    omit?: ContributionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContributionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Contribution to update in case it exists.
+     */
+    where: ContributionWhereUniqueInput
+    /**
+     * In case the Contribution found by the `where` argument doesn't exist, create a new Contribution with this data.
+     */
+    create: XOR<ContributionCreateInput, ContributionUncheckedCreateInput>
+    /**
+     * In case the Contribution was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ContributionUpdateInput, ContributionUncheckedUpdateInput>
+  }
+
+  /**
+   * Contribution delete
+   */
+  export type ContributionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contribution
+     */
+    select?: ContributionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contribution
+     */
+    omit?: ContributionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContributionInclude<ExtArgs> | null
+    /**
+     * Filter which Contribution to delete.
+     */
+    where: ContributionWhereUniqueInput
+  }
+
+  /**
+   * Contribution deleteMany
+   */
+  export type ContributionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Contributions to delete
+     */
+    where?: ContributionWhereInput
+    /**
+     * Limit how many Contributions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Contribution without action
+   */
+  export type ContributionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contribution
+     */
+    select?: ContributionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contribution
+     */
+    omit?: ContributionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContributionInclude<ExtArgs> | null
   }
 
 
@@ -1951,6 +3304,20 @@ export namespace Prisma {
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+  export const ContributionScalarFieldEnum: {
+    id: 'id',
+    user_id: 'user_id',
+    amount: 'amount',
+    month: 'month',
+    status: 'status',
+    notes: 'notes',
+    created_at: 'created_at',
+    updated_at: 'updated_at'
+  };
+
+  export type ContributionScalarFieldEnum = (typeof ContributionScalarFieldEnum)[keyof typeof ContributionScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -1965,6 +3332,14 @@ export namespace Prisma {
   };
 
   export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
+
+
+  export const NullsOrder: {
+    first: 'first',
+    last: 'last'
+  };
+
+  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
   /**
@@ -2022,6 +3397,34 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Decimal'
+   */
+  export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+    
+
+
+  /**
+   * Reference to a field of type 'Decimal[]'
+   */
+  export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Status'
+   */
+  export type EnumStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Status'>
+    
+
+
+  /**
+   * Reference to a field of type 'Status[]'
+   */
+  export type ListEnumStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Status[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -2049,6 +3452,7 @@ export namespace Prisma {
     is_admin?: BoolFilter<"User"> | boolean
     created_at?: DateTimeFilter<"User"> | Date | string
     updated_at?: DateTimeFilter<"User"> | Date | string
+    contributions?: ContributionListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -2059,6 +3463,7 @@ export namespace Prisma {
     is_admin?: SortOrder
     created_at?: SortOrder
     updated_at?: SortOrder
+    contributions?: ContributionOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -2072,6 +3477,7 @@ export namespace Prisma {
     is_admin?: BoolFilter<"User"> | boolean
     created_at?: DateTimeFilter<"User"> | Date | string
     updated_at?: DateTimeFilter<"User"> | Date | string
+    contributions?: ContributionListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -2102,6 +3508,78 @@ export namespace Prisma {
     updated_at?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
 
+  export type ContributionWhereInput = {
+    AND?: ContributionWhereInput | ContributionWhereInput[]
+    OR?: ContributionWhereInput[]
+    NOT?: ContributionWhereInput | ContributionWhereInput[]
+    id?: IntFilter<"Contribution"> | number
+    user_id?: IntFilter<"Contribution"> | number
+    amount?: DecimalFilter<"Contribution"> | Decimal | DecimalJsLike | number | string
+    month?: DateTimeFilter<"Contribution"> | Date | string
+    status?: EnumStatusFilter<"Contribution"> | $Enums.Status
+    notes?: StringNullableFilter<"Contribution"> | string | null
+    created_at?: DateTimeFilter<"Contribution"> | Date | string
+    updated_at?: DateTimeFilter<"Contribution"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type ContributionOrderByWithRelationInput = {
+    id?: SortOrder
+    user_id?: SortOrder
+    amount?: SortOrder
+    month?: SortOrder
+    status?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type ContributionWhereUniqueInput = Prisma.AtLeast<{
+    id?: number
+    AND?: ContributionWhereInput | ContributionWhereInput[]
+    OR?: ContributionWhereInput[]
+    NOT?: ContributionWhereInput | ContributionWhereInput[]
+    user_id?: IntFilter<"Contribution"> | number
+    amount?: DecimalFilter<"Contribution"> | Decimal | DecimalJsLike | number | string
+    month?: DateTimeFilter<"Contribution"> | Date | string
+    status?: EnumStatusFilter<"Contribution"> | $Enums.Status
+    notes?: StringNullableFilter<"Contribution"> | string | null
+    created_at?: DateTimeFilter<"Contribution"> | Date | string
+    updated_at?: DateTimeFilter<"Contribution"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type ContributionOrderByWithAggregationInput = {
+    id?: SortOrder
+    user_id?: SortOrder
+    amount?: SortOrder
+    month?: SortOrder
+    status?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+    _count?: ContributionCountOrderByAggregateInput
+    _avg?: ContributionAvgOrderByAggregateInput
+    _max?: ContributionMaxOrderByAggregateInput
+    _min?: ContributionMinOrderByAggregateInput
+    _sum?: ContributionSumOrderByAggregateInput
+  }
+
+  export type ContributionScalarWhereWithAggregatesInput = {
+    AND?: ContributionScalarWhereWithAggregatesInput | ContributionScalarWhereWithAggregatesInput[]
+    OR?: ContributionScalarWhereWithAggregatesInput[]
+    NOT?: ContributionScalarWhereWithAggregatesInput | ContributionScalarWhereWithAggregatesInput[]
+    id?: IntWithAggregatesFilter<"Contribution"> | number
+    user_id?: IntWithAggregatesFilter<"Contribution"> | number
+    amount?: DecimalWithAggregatesFilter<"Contribution"> | Decimal | DecimalJsLike | number | string
+    month?: DateTimeWithAggregatesFilter<"Contribution"> | Date | string
+    status?: EnumStatusWithAggregatesFilter<"Contribution"> | $Enums.Status
+    notes?: StringNullableWithAggregatesFilter<"Contribution"> | string | null
+    created_at?: DateTimeWithAggregatesFilter<"Contribution"> | Date | string
+    updated_at?: DateTimeWithAggregatesFilter<"Contribution"> | Date | string
+  }
+
   export type UserCreateInput = {
     fullname: string
     email: string
@@ -2109,6 +3587,7 @@ export namespace Prisma {
     is_admin?: boolean
     created_at?: Date | string
     updated_at?: Date | string
+    contributions?: ContributionCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -2119,6 +3598,7 @@ export namespace Prisma {
     is_admin?: boolean
     created_at?: Date | string
     updated_at?: Date | string
+    contributions?: ContributionUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -2128,6 +3608,7 @@ export namespace Prisma {
     is_admin?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    contributions?: ContributionUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -2138,6 +3619,7 @@ export namespace Prisma {
     is_admin?: BoolFieldUpdateOperationsInput | boolean
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    contributions?: ContributionUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -2165,6 +3647,79 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     is_admin?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContributionCreateInput = {
+    amount: Decimal | DecimalJsLike | number | string
+    month: Date | string
+    status?: $Enums.Status
+    notes?: string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+    user: UserCreateNestedOneWithoutContributionsInput
+  }
+
+  export type ContributionUncheckedCreateInput = {
+    id?: number
+    user_id: number
+    amount: Decimal | DecimalJsLike | number | string
+    month: Date | string
+    status?: $Enums.Status
+    notes?: string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type ContributionUpdateInput = {
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    month?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutContributionsNestedInput
+  }
+
+  export type ContributionUncheckedUpdateInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    user_id?: IntFieldUpdateOperationsInput | number
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    month?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContributionCreateManyInput = {
+    id?: number
+    user_id: number
+    amount: Decimal | DecimalJsLike | number | string
+    month: Date | string
+    status?: $Enums.Status
+    notes?: string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type ContributionUpdateManyMutationInput = {
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    month?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContributionUncheckedUpdateManyInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    user_id?: IntFieldUpdateOperationsInput | number
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    month?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
     created_at?: DateTimeFieldUpdateOperationsInput | Date | string
     updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -2209,6 +3764,16 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
+  }
+
+  export type ContributionListRelationFilter = {
+    every?: ContributionWhereInput
+    some?: ContributionWhereInput
+    none?: ContributionWhereInput
+  }
+
+  export type ContributionOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type UserCountOrderByAggregateInput = {
@@ -2305,6 +3870,152 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type DecimalFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+  }
+
+  export type EnumStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.Status | EnumStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.Status[] | ListEnumStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Status[] | ListEnumStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumStatusFilter<$PrismaModel> | $Enums.Status
+  }
+
+  export type StringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type UserScalarRelationFilter = {
+    is?: UserWhereInput
+    isNot?: UserWhereInput
+  }
+
+  export type SortOrderInput = {
+    sort: SortOrder
+    nulls?: NullsOrder
+  }
+
+  export type ContributionCountOrderByAggregateInput = {
+    id?: SortOrder
+    user_id?: SortOrder
+    amount?: SortOrder
+    month?: SortOrder
+    status?: SortOrder
+    notes?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type ContributionAvgOrderByAggregateInput = {
+    id?: SortOrder
+    user_id?: SortOrder
+    amount?: SortOrder
+  }
+
+  export type ContributionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    user_id?: SortOrder
+    amount?: SortOrder
+    month?: SortOrder
+    status?: SortOrder
+    notes?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type ContributionMinOrderByAggregateInput = {
+    id?: SortOrder
+    user_id?: SortOrder
+    amount?: SortOrder
+    month?: SortOrder
+    status?: SortOrder
+    notes?: SortOrder
+    created_at?: SortOrder
+    updated_at?: SortOrder
+  }
+
+  export type ContributionSumOrderByAggregateInput = {
+    id?: SortOrder
+    user_id?: SortOrder
+    amount?: SortOrder
+  }
+
+  export type DecimalWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedDecimalFilter<$PrismaModel>
+    _sum?: NestedDecimalFilter<$PrismaModel>
+    _min?: NestedDecimalFilter<$PrismaModel>
+    _max?: NestedDecimalFilter<$PrismaModel>
+  }
+
+  export type EnumStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Status | EnumStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.Status[] | ListEnumStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Status[] | ListEnumStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumStatusWithAggregatesFilter<$PrismaModel> | $Enums.Status
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumStatusFilter<$PrismaModel>
+    _max?: NestedEnumStatusFilter<$PrismaModel>
+  }
+
+  export type StringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    mode?: QueryMode
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type ContributionCreateNestedManyWithoutUserInput = {
+    create?: XOR<ContributionCreateWithoutUserInput, ContributionUncheckedCreateWithoutUserInput> | ContributionCreateWithoutUserInput[] | ContributionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ContributionCreateOrConnectWithoutUserInput | ContributionCreateOrConnectWithoutUserInput[]
+    createMany?: ContributionCreateManyUserInputEnvelope
+    connect?: ContributionWhereUniqueInput | ContributionWhereUniqueInput[]
+  }
+
+  export type ContributionUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<ContributionCreateWithoutUserInput, ContributionUncheckedCreateWithoutUserInput> | ContributionCreateWithoutUserInput[] | ContributionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ContributionCreateOrConnectWithoutUserInput | ContributionCreateOrConnectWithoutUserInput[]
+    createMany?: ContributionCreateManyUserInputEnvelope
+    connect?: ContributionWhereUniqueInput | ContributionWhereUniqueInput[]
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
@@ -2317,12 +4028,70 @@ export namespace Prisma {
     set?: Date | string
   }
 
+  export type ContributionUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ContributionCreateWithoutUserInput, ContributionUncheckedCreateWithoutUserInput> | ContributionCreateWithoutUserInput[] | ContributionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ContributionCreateOrConnectWithoutUserInput | ContributionCreateOrConnectWithoutUserInput[]
+    upsert?: ContributionUpsertWithWhereUniqueWithoutUserInput | ContributionUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ContributionCreateManyUserInputEnvelope
+    set?: ContributionWhereUniqueInput | ContributionWhereUniqueInput[]
+    disconnect?: ContributionWhereUniqueInput | ContributionWhereUniqueInput[]
+    delete?: ContributionWhereUniqueInput | ContributionWhereUniqueInput[]
+    connect?: ContributionWhereUniqueInput | ContributionWhereUniqueInput[]
+    update?: ContributionUpdateWithWhereUniqueWithoutUserInput | ContributionUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ContributionUpdateManyWithWhereWithoutUserInput | ContributionUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ContributionScalarWhereInput | ContributionScalarWhereInput[]
+  }
+
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
     decrement?: number
     multiply?: number
     divide?: number
+  }
+
+  export type ContributionUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ContributionCreateWithoutUserInput, ContributionUncheckedCreateWithoutUserInput> | ContributionCreateWithoutUserInput[] | ContributionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ContributionCreateOrConnectWithoutUserInput | ContributionCreateOrConnectWithoutUserInput[]
+    upsert?: ContributionUpsertWithWhereUniqueWithoutUserInput | ContributionUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ContributionCreateManyUserInputEnvelope
+    set?: ContributionWhereUniqueInput | ContributionWhereUniqueInput[]
+    disconnect?: ContributionWhereUniqueInput | ContributionWhereUniqueInput[]
+    delete?: ContributionWhereUniqueInput | ContributionWhereUniqueInput[]
+    connect?: ContributionWhereUniqueInput | ContributionWhereUniqueInput[]
+    update?: ContributionUpdateWithWhereUniqueWithoutUserInput | ContributionUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ContributionUpdateManyWithWhereWithoutUserInput | ContributionUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ContributionScalarWhereInput | ContributionScalarWhereInput[]
+  }
+
+  export type UserCreateNestedOneWithoutContributionsInput = {
+    create?: XOR<UserCreateWithoutContributionsInput, UserUncheckedCreateWithoutContributionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutContributionsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type DecimalFieldUpdateOperationsInput = {
+    set?: Decimal | DecimalJsLike | number | string
+    increment?: Decimal | DecimalJsLike | number | string
+    decrement?: Decimal | DecimalJsLike | number | string
+    multiply?: Decimal | DecimalJsLike | number | string
+    divide?: Decimal | DecimalJsLike | number | string
+  }
+
+  export type EnumStatusFieldUpdateOperationsInput = {
+    set?: $Enums.Status
+  }
+
+  export type NullableStringFieldUpdateOperationsInput = {
+    set?: string | null
+  }
+
+  export type UserUpdateOneRequiredWithoutContributionsNestedInput = {
+    create?: XOR<UserCreateWithoutContributionsInput, UserUncheckedCreateWithoutContributionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutContributionsInput
+    upsert?: UserUpsertWithoutContributionsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutContributionsInput, UserUpdateWithoutContributionsInput>, UserUncheckedUpdateWithoutContributionsInput>
   }
 
   export type NestedIntFilter<$PrismaModel = never> = {
@@ -2430,6 +4199,244 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedDecimalFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+  }
+
+  export type NestedEnumStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.Status | EnumStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.Status[] | ListEnumStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Status[] | ListEnumStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumStatusFilter<$PrismaModel> | $Enums.Status
+  }
+
+  export type NestedStringNullableFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableFilter<$PrismaModel> | string | null
+  }
+
+  export type NestedDecimalWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel>
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedDecimalFilter<$PrismaModel>
+    _sum?: NestedDecimalFilter<$PrismaModel>
+    _min?: NestedDecimalFilter<$PrismaModel>
+    _max?: NestedDecimalFilter<$PrismaModel>
+  }
+
+  export type NestedEnumStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Status | EnumStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.Status[] | ListEnumStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Status[] | ListEnumStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumStatusWithAggregatesFilter<$PrismaModel> | $Enums.Status
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumStatusFilter<$PrismaModel>
+    _max?: NestedEnumStatusFilter<$PrismaModel>
+  }
+
+  export type NestedStringNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: string | StringFieldRefInput<$PrismaModel> | null
+    in?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    notIn?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    lt?: string | StringFieldRefInput<$PrismaModel>
+    lte?: string | StringFieldRefInput<$PrismaModel>
+    gt?: string | StringFieldRefInput<$PrismaModel>
+    gte?: string | StringFieldRefInput<$PrismaModel>
+    contains?: string | StringFieldRefInput<$PrismaModel>
+    startsWith?: string | StringFieldRefInput<$PrismaModel>
+    endsWith?: string | StringFieldRefInput<$PrismaModel>
+    not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedStringNullableFilter<$PrismaModel>
+    _max?: NestedStringNullableFilter<$PrismaModel>
+  }
+
+  export type NestedIntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type ContributionCreateWithoutUserInput = {
+    amount: Decimal | DecimalJsLike | number | string
+    month: Date | string
+    status?: $Enums.Status
+    notes?: string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type ContributionUncheckedCreateWithoutUserInput = {
+    id?: number
+    amount: Decimal | DecimalJsLike | number | string
+    month: Date | string
+    status?: $Enums.Status
+    notes?: string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type ContributionCreateOrConnectWithoutUserInput = {
+    where: ContributionWhereUniqueInput
+    create: XOR<ContributionCreateWithoutUserInput, ContributionUncheckedCreateWithoutUserInput>
+  }
+
+  export type ContributionCreateManyUserInputEnvelope = {
+    data: ContributionCreateManyUserInput | ContributionCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ContributionUpsertWithWhereUniqueWithoutUserInput = {
+    where: ContributionWhereUniqueInput
+    update: XOR<ContributionUpdateWithoutUserInput, ContributionUncheckedUpdateWithoutUserInput>
+    create: XOR<ContributionCreateWithoutUserInput, ContributionUncheckedCreateWithoutUserInput>
+  }
+
+  export type ContributionUpdateWithWhereUniqueWithoutUserInput = {
+    where: ContributionWhereUniqueInput
+    data: XOR<ContributionUpdateWithoutUserInput, ContributionUncheckedUpdateWithoutUserInput>
+  }
+
+  export type ContributionUpdateManyWithWhereWithoutUserInput = {
+    where: ContributionScalarWhereInput
+    data: XOR<ContributionUpdateManyMutationInput, ContributionUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type ContributionScalarWhereInput = {
+    AND?: ContributionScalarWhereInput | ContributionScalarWhereInput[]
+    OR?: ContributionScalarWhereInput[]
+    NOT?: ContributionScalarWhereInput | ContributionScalarWhereInput[]
+    id?: IntFilter<"Contribution"> | number
+    user_id?: IntFilter<"Contribution"> | number
+    amount?: DecimalFilter<"Contribution"> | Decimal | DecimalJsLike | number | string
+    month?: DateTimeFilter<"Contribution"> | Date | string
+    status?: EnumStatusFilter<"Contribution"> | $Enums.Status
+    notes?: StringNullableFilter<"Contribution"> | string | null
+    created_at?: DateTimeFilter<"Contribution"> | Date | string
+    updated_at?: DateTimeFilter<"Contribution"> | Date | string
+  }
+
+  export type UserCreateWithoutContributionsInput = {
+    fullname: string
+    email: string
+    password: string
+    is_admin?: boolean
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type UserUncheckedCreateWithoutContributionsInput = {
+    id?: number
+    fullname: string
+    email: string
+    password: string
+    is_admin?: boolean
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type UserCreateOrConnectWithoutContributionsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutContributionsInput, UserUncheckedCreateWithoutContributionsInput>
+  }
+
+  export type UserUpsertWithoutContributionsInput = {
+    update: XOR<UserUpdateWithoutContributionsInput, UserUncheckedUpdateWithoutContributionsInput>
+    create: XOR<UserCreateWithoutContributionsInput, UserUncheckedCreateWithoutContributionsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutContributionsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutContributionsInput, UserUncheckedUpdateWithoutContributionsInput>
+  }
+
+  export type UserUpdateWithoutContributionsInput = {
+    fullname?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    is_admin?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserUncheckedUpdateWithoutContributionsInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    fullname?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    is_admin?: BoolFieldUpdateOperationsInput | boolean
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContributionCreateManyUserInput = {
+    id?: number
+    amount: Decimal | DecimalJsLike | number | string
+    month: Date | string
+    status?: $Enums.Status
+    notes?: string | null
+    created_at?: Date | string
+    updated_at?: Date | string
+  }
+
+  export type ContributionUpdateWithoutUserInput = {
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    month?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContributionUncheckedUpdateWithoutUserInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    month?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContributionUncheckedUpdateManyWithoutUserInput = {
+    id?: IntFieldUpdateOperationsInput | number
+    amount?: DecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string
+    month?: DateTimeFieldUpdateOperationsInput | Date | string
+    status?: EnumStatusFieldUpdateOperationsInput | $Enums.Status
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    created_at?: DateTimeFieldUpdateOperationsInput | Date | string
+    updated_at?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 
