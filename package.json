@@ -9,7 +9,7 @@
     "lint": "next lint",
     "migrate:fresh": "prisma migrate reset --force",
     "prisma:generate": "prisma generate",
-    "seed": "psql -d contrihub -f prisma/seed.sql",
+    "seed": "prisma db seed",
     "seed:all": "npm run migrate:fresh && npm run prisma:generate && npm run seed"
   },
   "dependencies": {
@@ -32,5 +32,8 @@
     "tailwindcss": "^4",
     "ts-node": "^10.9.2",
     "typescript": "^5"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   }
 }

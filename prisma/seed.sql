@@ -1,48 +1,39 @@
+-- Clear existing data
+TRUNCATE TABLE contributions CASCADE;
+TRUNCATE TABLE users CASCADE;
+
 -- Insert test users
-INSERT INTO "User" (email, password, fullname, is_admin, created_at, updated_at) VALUES
-('admin@example.com', '$2a$12$QpVfF0oxVJN46Z/U4gyIXOghy/ehV7Sjs8L0Azq/UErVhYC/qsv8C', 'Admin User', true, NOW(), NOW()),
-('john@example.com', '$2a$12$QpVfF0oxVJN46Z/U4gyIXOghy/ehV7Sjs8L0Azq/UErVhYC/qsv8C', 'John Doe', false, NOW(), NOW()),
-('jane@example.com', '$2a$12$QpVfF0oxVJN46Z/U4gyIXOghy/ehV7Sjs8L0Azq/UErVhYC/qsv8C', 'Jane Smith', false, NOW(), NOW()),
-('bob@example.com', '$2a$12$QpVfF0oxVJN46Z/U4gyIXOghy/ehV7Sjs8L0Azq/UErVhYC/qsv8C', 'Bob Johnson', false, NOW(), NOW());
+INSERT INTO users (fullname, email, password, is_admin, created_at, updated_at) VALUES
+('John Doe', 'john.doe@example.com', '$2a$10$X7z3DBkUxUZG1hGYWQz6UeBZJQN9QZQZQZQZQZQZQZQZQZQZQZQZ', true, NOW(), NOW()),
+('Jane Smith', 'jane.smith@example.com', '$2a$10$X7z3DBkUxUZG1hGYWQz6UeBZJQN9QZQZQZQZQZQZQZQZQZQZQZQZ', false, NOW(), NOW()),
+('Mike Johnson', 'mike.johnson@example.com', '$2a$10$X7z3DBkUxUZG1hGYWQz6UeBZJQN9QZQZQZQZQZQZQZQZQZQZQZQZ', false, NOW(), NOW()),
+('Sarah Williams', 'sarah.williams@example.com', '$2a$10$X7z3DBkUxUZG1hGYWQz6UeBZJQN9QZQZQZQZQZQZQZQZQZQZQZQZ', true, NOW(), NOW()),
+('David Brown', 'david.brown@example.com', '$2a$10$X7z3DBkUxUZG1hGYWQz6UeBZJQN9QZQZQZQZQZQZQZQZQZQZQZQZ', false, NOW(), NOW()),
+('Emily Davis', 'emily.davis@example.com', '$2a$10$X7z3DBkUxUZG1hGYWQz6UeBZJQN9QZQZQZQZQZQZQZQZQZQZQZQZ', false, NOW(), NOW()),
+('Robert Wilson', 'robert.wilson@example.com', '$2a$10$X7z3DBkUxUZG1hGYWQz6UeBZJQN9QZQZQZQZQZQZQZQZQZQZQZQZ', false, NOW(), NOW()),
+('Lisa Anderson', 'lisa.anderson@example.com', '$2a$10$X7z3DBkUxUZG1hGYWQz6UeBZJQN9QZQZQZQZQZQZQZQZQZQZQZQZ', false, NOW(), NOW()),
+('Michael Taylor', 'michael.taylor@example.com', '$2a$10$X7z3DBkUxUZG1hGYWQz6UeBZJQN9QZQZQZQZQZQZQZQZQZQZQZQZ', false, NOW(), NOW()),
+('Jennifer Martinez', 'jennifer.martinez@example.com', '$2a$10$X7z3DBkUxUZG1hGYWQz6UeBZJQN9QZQZQZQZQZQZQZQZQZQZQZQZ', false, NOW(), NOW());
 
--- Insert test contributions for the last 6 months
-WITH RECURSIVE months AS (
-  SELECT CURRENT_DATE - INTERVAL '5 months' as month
-  UNION ALL
-  SELECT month + INTERVAL '1 month'
-  FROM months
-  WHERE month < CURRENT_DATE
-),
-users AS (
-  SELECT id FROM "User" WHERE is_admin = false
-)
-INSERT INTO "Contribution" (user_id, amount, month, status, notes, created_at, updated_at)
-SELECT 
-  u.id,
-  (FLOOR(RANDOM() * 1000 + 500)::INTEGER)::DECIMAL(10,2), -- Random amount between 500 and 1500
-  m.month,
-  CASE 
-    WHEN RANDOM() < 0.7 THEN 'PAID'::"Status"
-    ELSE 'PENDING'::"Status"
-  END,
-  CASE 
-    WHEN RANDOM() < 0.3 THEN 'Monthly contribution'
-    ELSE NULL
-  END,
-  NOW(),
-  NOW()
-FROM users u
-CROSS JOIN months m;
-
--- Insert one missed contribution for each user from 2 months ago
-INSERT INTO "Contribution" (user_id, amount, month, status, notes, created_at, updated_at)
-SELECT 
-  id,
-  (FLOOR(RANDOM() * 1000 + 500)::INTEGER)::DECIMAL(10,2),
-  CURRENT_DATE - INTERVAL '2 months',
-  'MISSED'::"Status",
-  'Missed contribution',
-  NOW(),
-  NOW()
-FROM "User"
-WHERE is_admin = false; 
+-- Insert test contributions
+INSERT INTO contributions (user_id, amount, month, status, created_at, updated_at) VALUES
+(1, 1000.00, '2024-01-01', 'APPROVED', NOW(), NOW()),
+(1, 1000.00, '2024-02-01', 'APPROVED', NOW(), NOW()),
+(2, 1000.00, '2024-01-01', 'APPROVED', NOW(), NOW()),
+(2, 1000.00, '2024-02-01', 'PENDING', NOW(), NOW()),
+(3, 1000.00, '2024-01-01', 'APPROVED', NOW(), NOW()),
+(3, 1000.00, '2024-02-01', 'REJECTED', NOW(), NOW()),
+(4, 1000.00, '2024-01-01', 'APPROVED', NOW(), NOW()),
+(4, 1000.00, '2024-02-01', 'APPROVED', NOW(), NOW()),
+(5, 1000.00, '2024-01-01', 'APPROVED', NOW(), NOW()),
+(5, 1000.00, '2024-02-01', 'PENDING', NOW(), NOW()),
+(6, 1000.00, '2024-01-01', 'APPROVED', NOW(), NOW()),
+(6, 1000.00, '2024-02-01', 'APPROVED', NOW(), NOW()),
+(7, 1000.00, '2024-01-01', 'APPROVED', NOW(), NOW()),
+(7, 1000.00, '2024-02-01', 'REJECTED', NOW(), NOW()),
+(8, 1000.00, '2024-01-01', 'APPROVED', NOW(), NOW()),
+(8, 1000.00, '2024-02-01', 'PENDING', NOW(), NOW()),
+(9, 1000.00, '2024-01-01', 'APPROVED', NOW(), NOW()),
+(9, 1000.00, '2024-02-01', 'APPROVED', NOW(), NOW()),
+(10, 1000.00, '2024-01-01', 'APPROVED', NOW(), NOW()),
+(10, 1000.00, '2024-02-01', 'PENDING', NOW(), NOW()); 
