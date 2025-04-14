@@ -14,20 +14,33 @@ interface DataTableProps {
   data: any[]
   itemsPerPage?: number
   className?: string
+  searchableColumns?: string[]
 }
 
 export default function DataTable({
   columns,
   data,
   itemsPerPage: initialItemsPerPage = 10,
-  className = ''
+  className = '',
+  searchableColumns = []
 }: DataTableProps) {
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(initialItemsPerPage)
-  const totalPages = Math.ceil(data.length / itemsPerPage)
+  const [searchTerm, setSearchTerm] = useState('')
+
+  // Filter data based on search term
+  const filteredData = data.filter(item => {
+    if (!searchTerm) return true
+    return searchableColumns.some(column => {
+      const value = item[column]
+      return value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    })
+  })
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage)
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
-  const currentData = data.slice(startIndex, endIndex)
+  const currentData = filteredData.slice(startIndex, endIndex)
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
@@ -51,6 +64,11 @@ export default function DataTable({
     setCurrentPage(1) // Reset to first page when changing items per page
   }
 
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value)
+    setCurrentPage(1) // Reset to first page when searching
+  }
+
   const getPageNumbers = () => {
     const pageNumbers = []
     const maxVisiblePages = 5
@@ -70,6 +88,18 @@ export default function DataTable({
 
   return (
     <div className={`overflow-x-auto ${className}`}>
+      {searchableColumns.length > 0 && (
+        <div className="flex justify-end mb-4">
+          <input
+            type="text"
+            placeholder="Search..."
+            value={searchTerm}
+            onChange={handleSearch}
+            className="w-64 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      )}
+
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
@@ -124,9 +154,9 @@ export default function DataTable({
               <p className="text-sm text-gray-700">
                 Showing <span className="font-medium">{startIndex + 1}</span> to{' '}
                 <span className="font-medium">
-                  {Math.min(endIndex, data.length)}
+                  {Math.min(endIndex, filteredData.length)}
                 </span>{' '}
-                of <span className="font-medium">{data.length}</span> results
+                of <span className="font-medium">{filteredData.length}</span> results
               </p>
               <div className="flex items-center space-x-2">
                 <label htmlFor="itemsPerPage" className="text-sm text-gray-700">

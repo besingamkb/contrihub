@@ -7,7 +7,7 @@ export async function GET(request: Request) {
     const users = await prisma.user.findMany({
       select: {
         id: true,
-        fullname: true,
+        name: true,
         email: true,
         is_admin: true,
       },
@@ -25,7 +25,7 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { fullname, email, password, is_admin } = body
+    const { name, email, password, is_admin } = body
 
     // Check if email already exists
     const existingUser = await prisma.user.findUnique({
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     // Create user
     const user = await prisma.user.create({
       data: {
-        fullname,
+        name,
         email,
         password: hashedPassword,
         is_admin,

@@ -1,87 +1,51 @@
-import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
+import { getServerSession } from "next-auth"
+import { NextResponse } from "next/server"
+import { authOptions } from "../auth/[...nextauth]/route"
+import prisma from "@/lib/prisma"
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    // Get user from request headers
-    const userHeader = request.headers.get('user')
-    if (!userHeader) {
+    const session = await getServerSession(authOptions)
+    
+    if (!session?.user) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: "Unauthorized" },
         { status: 401 }
       )
     }
 
-    const user = JSON.parse(userHeader)
-
-    // If user is not admin, only return their own data
-    if (!user.is_admin) {
-      const userContributions = await prisma.contribution.findMany({
-        where: {
-          user_id: user.id
-        },
-        orderBy: {
-          month: 'desc'
-        },
-        take: 5
-      })
-
-      const totalAmount = await prisma.contribution.aggregate({
-        where: {
-          user_id: user.id
-        },
-        _sum: {
-          amount: true
-        }
-      })
-
-      return NextResponse.json({
-        stats: {
-          totalContributions: userContributions.length,
-          totalMembers: 1, // Only themselves
-          pendingContributions: userContributions.filter(c => c.status === 'PENDING').length,
-          totalAmount: totalAmount._sum.amount || 0
-        },
-        recentContributions: userContributions.map(contribution => ({
-          id: contribution.id,
-          user: {
-            fullname: user.fullname
-          },
-          amount: contribution.amount,
-          month: contribution.month,
-          status: contribution.status
-        }))
-      })
-    }
-
-    // Admin can see all data
-    const totalContributions = await prisma.contribution.count()
+    // Get total members count
     const totalMembers = await prisma.user.count()
-    const pendingContributions = await prisma.contribution.count({
-      where: {
-        status: 'PENDING'
-      }
-    })
-    const totalAmountResult = await prisma.contribution.aggregate({
-      _sum: {
-        amount: true
-      }
-    })
-    const totalAmount = totalAmountResult._sum.amount || 0
 
-    const recentContributions = await prisma.contribution.findMany({
-      take: 5,
-      orderBy: {
-        month: 'desc'
-      },
+    // Get all contributions
+    const contributions = await prisma.contribution.findMany({
       include: {
         user: {
           select: {
-            fullname: true
+            name: true
           }
         }
+      },
+      orderBy: {
+        month: 'desc'
       }
     })
+
+    // Calculate stats
+    const totalContributions = contributions.length
+    const pendingContributions = contributions.filter(c => c.status === 'PENDING').length
+    const totalAmount = contributions.reduce((sum, c) => sum + Number(c.amount), 0)
+
+    // Get recent contributions
+    const recentContributions = contributions.slice(0, 10).map(c => ({
+      id: c.id,
+      user: {
+        fullname: c.user.name // Map name to fullname for frontend compatibility
+      },
+      amount: Number(c.amount),
+      month: c.month.toISOString(),
+      status: c.status
+    }))
 
     return NextResponse.json({
       stats: {
@@ -93,9 +57,9 @@ export async function GET(request: Request) {
       recentContributions
     })
   } catch (error) {
-    console.error('Error fetching dashboard data:', error)
+    console.error('Dashboard API Error:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch dashboard data' },
+      { error: "Internal server error" },
       { status: 500 }
     )
   }

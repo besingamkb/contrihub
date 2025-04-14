@@ -5,27 +5,25 @@ import { faker } from '@faker-js/faker';
 const prisma = new PrismaClient();
 
 async function main() {
-  // Clear existing data
-  await prisma.contribution.deleteMany();
-  await prisma.user.deleteMany();
+  console.log('Starting database seeding...');
 
   // Create admin users
   const adminUsers = await prisma.user.createMany({
     data: [
       {
-        fullname: 'John Doe',
+        name: 'John Doe',
         email: 'john.doe@example.com',
         password: await bcrypt.hash('password123', 10),
         is_admin: true,
       },
       {
-        fullname: 'Sarah Williams',
+        name: 'Sarah Williams',
         email: 'sarah.williams@example.com',
         password: await bcrypt.hash('password123', 10),
         is_admin: true,
       },
       {
-        fullname: 'Michael Chen',
+        name: 'Michael Chen',
         email: 'michael.chen@example.com',
         password: await bcrypt.hash('password123', 10),
         is_admin: false,
@@ -35,7 +33,7 @@ async function main() {
 
   // Create regular members (50 users)
   const regularMembers = Array.from({ length: 50 }, () => ({
-    fullname: faker.person.fullName(),
+    name: faker.person.fullName(),
     email: faker.internet.email(),
     password: 'password123', // We'll hash this later
     is_admin: false,
@@ -131,7 +129,7 @@ async function main() {
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error('Seeding error:', e);
     process.exit(1);
   })
   .finally(async () => {

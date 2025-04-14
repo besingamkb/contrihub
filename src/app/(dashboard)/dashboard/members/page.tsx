@@ -9,7 +9,7 @@ import DataTable from '@/components/DataTable'
 
 interface User {
   id: number
-  fullname: string
+  name: string
   email: string
   is_admin: boolean
 }
@@ -70,7 +70,7 @@ export default function MembersPage() {
   const columns = [
     {
       header: 'Full Name',
-      accessor: 'fullname',
+      accessor: 'name',
       render: (value: string, row: User) => (
         <Link
           href={`/dashboard/members/${row.id}`}
@@ -143,6 +143,7 @@ export default function MembersPage() {
           columns={columns}
           data={users}
           itemsPerPage={10}
+          searchableColumns={['name', 'email']}
         />
       </div>
 

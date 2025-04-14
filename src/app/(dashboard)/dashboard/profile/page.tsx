@@ -1,57 +1,51 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
-interface UserContribution {
+type UserData = {
   id: number
-  amount: number
-  month: string
-  status: string
-  notes: string | null
-}
-
-interface UserData {
-  id: number
-  fullname: string
+  name: string
   email: string
-  role: string
-  contributions: UserContribution[]
+  is_admin: boolean
 }
 
 export default function ProfilePage() {
+  const { data: session, status } = useSession()
   const router = useRouter()
-  const [userData, setUserData] = useState<UserData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [userData, setUserData] = useState<UserData | null>(null)
 
   useEffect(() => {
-    const user = localStorage.getItem('user')
-    if (!user) {
+    if (status === 'loading') return
+    if (!session) {
       router.push('/login')
       return
     }
 
-    const fetchUserData = async () => {
-      try {
-        setLoading(true)
-        const userData = JSON.parse(user)
-        const response = await fetch(`/api/users/${userData.id}`)
-        if (!response.ok) {
-          throw new Error('Failed to fetch user data')
-        }
-        const data = await response.json()
-        setUserData(data)
-      } catch (error) {
-        console.error('Error fetching user data:', error)
-        setError(error instanceof Error ? error.message : 'Failed to fetch user data')
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchUserData()
-  }, [router])
+  }, [session, status, router])
+
+  const fetchUserData = async () => {
+    try {
+      setLoading(true)
+      const response = await fetch(`/api/users/${session?.user?.id}`)
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to fetch user data')
+      }
+      const data = await response.json()
+      setUserData(data)
+      setError(null)
+    } catch (error) {
+      console.error('Error fetching user data:', error)
+      setError(error instanceof Error ? error.message : 'Failed to fetch user data')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   if (loading) {
     return (
@@ -74,68 +68,26 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">My Profile</h1>
-      
-      {/* User Information */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:px-6">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">Personal Information</h3>
-        </div>
-        <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
-          <dl className="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-2">
-            <div className="sm:col-span-1">
-              <dt className="text-sm font-medium text-gray-500">Full Name</dt>
-              <dd className="mt-1 text-sm text-gray-900">{userData.fullname}</dd>
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-3xl mx-auto">
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Profile</h1>
+        <div className="bg-white shadow rounded-lg p-6">
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-lg font-medium text-gray-900">Full Name</h3>
+              <p className="mt-1 text-sm text-gray-500">{userData.name}</p>
             </div>
-            <div className="sm:col-span-1">
-              <dt className="text-sm font-medium text-gray-500">Email</dt>
-              <dd className="mt-1 text-sm text-gray-900">{userData.email}</dd>
+            <div>
+              <h3 className="text-lg font-medium text-gray-900">Email</h3>
+              <p className="mt-1 text-sm text-gray-500">{userData.email}</p>
             </div>
-            <div className="sm:col-span-1">
-              <dt className="text-sm font-medium text-gray-500">Role</dt>
-              <dd className="mt-1 text-sm text-gray-900">{userData.role}</dd>
+            <div>
+              <h3 className="text-lg font-medium text-gray-900">Role</h3>
+              <p className="mt-1 text-sm text-gray-500">
+                {userData.is_admin ? 'Admin' : 'Member'}
+              </p>
             </div>
-          </dl>
-        </div>
-      </div>
-
-      {/* Contributions */}
-      <div className="bg-white shadow rounded-lg">
-        <div className="px-4 py-5 sm:px-6">
-          <h3 className="text-lg leading-6 font-medium text-gray-900">My Contributions</h3>
-        </div>
-        <div className="border-t border-gray-200">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Month</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notes</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {userData.contributions.map((contribution) => (
-                <tr key={contribution.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₱{contribution.amount.toLocaleString()}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {new Date(contribution.month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      contribution.status === 'PAID' ? 'bg-green-100 text-green-800' :
-                      contribution.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-red-100 text-red-800'
-                    }`}>
-                      {contribution.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{contribution.notes || '-'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          </div>
         </div>
       </div>
     </div>

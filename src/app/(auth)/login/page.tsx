@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 
 type FormErrors = {
   email?: string
@@ -47,25 +48,19 @@ export default function LoginPage() {
     setErrors({})
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
+      const result = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
       })
 
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Login failed')
+      if (result?.error) {
+        throw new Error(result.error)
       }
 
-      // Store user data in session
-      localStorage.setItem('user', JSON.stringify(data.user))
-      
       // Redirect to dashboard
       router.push('/dashboard')
+      router.refresh()
     } catch (err) {
       setErrors({
         form: err instanceof Error ? err.message : 'Login failed',

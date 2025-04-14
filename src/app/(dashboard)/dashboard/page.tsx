@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 
 interface DashboardStats {
   totalContributions: number
@@ -13,7 +14,7 @@ interface DashboardStats {
 interface RecentContribution {
   id: number
   user: {
-    fullname: string
+    name: string
   }
   amount: number
   month: string
@@ -22,20 +23,23 @@ interface RecentContribution {
 
 export default function DashboardPage() {
   const router = useRouter()
+  const { data: session, status } = useSession()
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [recentContributions, setRecentContributions] = useState<RecentContribution[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const user = localStorage.getItem('user')
-    if (!user) {
+    if (status === 'loading') return
+
+    if (!session) {
       router.push('/login')
       return
     }
 
-    const userData = JSON.parse(user)
-    if (!userData.is_admin) {
+    // Check if user is not an admin and redirect to profile
+    const user = session.user as { id: string; email: string; name: string; is_admin: boolean }
+    if (!user.is_admin) {
       router.push('/dashboard/profile')
       return
     }
@@ -43,11 +47,7 @@ export default function DashboardPage() {
     const fetchDashboardData = async () => {
       try {
         setLoading(true)
-        const response = await fetch('/api/dashboard', {
-          headers: {
-            'user': user
-          }
-        })
+        const response = await fetch('/api/dashboard')
         console.log('API Response:', response)
         
         if (!response.ok) {
@@ -69,7 +69,7 @@ export default function DashboardPage() {
     }
 
     fetchDashboardData()
-  }, [router])
+  }, [router, session, status])
 
   if (loading) {
     return (
@@ -188,7 +188,7 @@ export default function DashboardPage() {
             <tbody className="bg-white divide-y divide-gray-200">
               {recentContributions.map((contribution) => (
                 <tr key={contribution.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{contribution.user.fullname}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{contribution.user.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₱{contribution.amount.toLocaleString()}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {new Date(contribution.month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}

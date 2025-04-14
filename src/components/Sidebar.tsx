@@ -2,29 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
-
-interface User {
-  id: number
-  fullname: string
-  email: string
-  is_admin: boolean
-}
+import { useSession, signOut } from 'next-auth/react'
 
 export default function Sidebar() {
   const pathname = usePathname()
-  const [user, setUser] = useState<User | null>(null)
+  const { data: session } = useSession()
 
-  useEffect(() => {
-    const userData = localStorage.getItem('user')
-    if (userData) {
-      setUser(JSON.parse(userData))
-    }
-  }, [])
-
-  const handleLogout = () => {
-    localStorage.removeItem('user')
-    window.location.href = '/login'
+  const handleLogout = async () => {
+    await signOut({ redirect: true, callbackUrl: '/login' })
   }
 
   return (
@@ -33,7 +18,7 @@ export default function Sidebar() {
         <h1 className="text-white text-xl font-bold">ContriHub</h1>
       </div>
       <nav className="flex-1 px-2 py-4 space-y-1">
-        {user?.is_admin ? (
+        {session?.user?.is_admin ? (
           // Admin Navigation
           <>
             <Link
@@ -114,6 +99,9 @@ export default function Sidebar() {
         )}
       </nav>
       <div className="p-4 border-t">
+        <div className="mb-4 px-4 py-2 text-sm text-gray-600">
+          Signed in as: {session?.user?.name}
+        </div>
         <button
           onClick={handleLogout}
           className="w-full px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
