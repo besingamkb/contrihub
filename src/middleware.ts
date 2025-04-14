@@ -22,7 +22,7 @@ export default withAuth(
       }
 
       // Protect admin-only API routes
-      if (path.startsWith('/api/users') || path.startsWith('/api/dashboard')) {
+      if (path.startsWith('/api/dashboard')) {
         if (!isAdmin) {
           return NextResponse.json(
             { error: 'Unauthorized' },

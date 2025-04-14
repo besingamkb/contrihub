@@ -14,7 +14,7 @@ interface DashboardStats {
 interface RecentContribution {
   id: number
   user: {
-    name: string
+    fullname: string
   }
   amount: number
   month: string
@@ -188,7 +188,7 @@ export default function DashboardPage() {
             <tbody className="bg-white divide-y divide-gray-200">
               {recentContributions.map((contribution) => (
                 <tr key={contribution.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{contribution.user.name}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{contribution.user.fullname}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₱{contribution.amount.toLocaleString()}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {new Date(contribution.month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
