@@ -60,7 +60,8 @@ model Contribution {
   id         Int       @id @default(autoincrement())
   user_id    Int
   amount     Decimal   @db.Decimal(10, 2)
-  month      DateTime
+  month      String
+  year       Int
   status     Status    @default(PENDING)
   notes      String?   @db.Text
   created_at DateTime  @default(now())

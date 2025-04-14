@@ -5,7 +5,10 @@ export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const userId = searchParams.get('user_id')
+    const month = searchParams.get('month')
+    const year = searchParams.get('year')
 
+    let whereClause = {}
     if (userId) {
       const userIdNum = parseInt(userId)
       if (isNaN(userIdNum)) {
@@ -14,36 +17,30 @@ export async function GET(request: Request) {
           { status: 400 }
         )
       }
-
-      const contributions = await prisma.contribution.findMany({
-        where: {
-          user_id: userIdNum
-        },
-        orderBy: {
-          month: 'desc'
-        },
-        include: {
-          user: {
-            select: {
-              fullname: true,
-              email: true
-            }
-          }
-        }
-      })
-
-      return NextResponse.json(contributions)
+      whereClause = { ...whereClause, user_id: userIdNum }
     }
 
-    // If no user_id provided, return all contributions
+    if (month && year) {
+      const yearNum = parseInt(year)
+      if (isNaN(yearNum)) {
+        return NextResponse.json(
+          { error: 'Invalid year' },
+          { status: 400 }
+        )
+      }
+      whereClause = { ...whereClause, month, year: yearNum }
+    }
+
     const contributions = await prisma.contribution.findMany({
-      orderBy: {
-        month: 'desc'
-      },
+      where: whereClause,
+      orderBy: [
+        { year: 'desc' },
+        { month: 'desc' }
+      ],
       include: {
         user: {
           select: {
-            fullname: true,
+            name: true,
             email: true
           }
         }

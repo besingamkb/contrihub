@@ -22,9 +22,10 @@ export async function GET() {
       include: {
         user: true
       },
-      orderBy: {
-        month: 'desc'
-      }
+      orderBy: [
+        { year: 'desc' },
+        { month: 'desc' }
+      ]
     })
 
     // Calculate stats
@@ -39,7 +40,8 @@ export async function GET() {
         name: c.user.name
       },
       amount: Number(c.amount),
-      month: c.month.toISOString(),
+      month: c.month,
+      year: c.year,
       status: c.status
     }))
 

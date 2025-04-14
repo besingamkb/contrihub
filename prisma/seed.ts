@@ -7,53 +7,63 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Starting database seeding...');
 
-  // Create admin users
-  const adminUsers = await prisma.user.createMany({
-    data: [
-      {
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: true,
-      },
-      {
-        name: 'Sarah Williams',
-        email: 'sarah.williams@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: true,
-      },
-      {
-        name: 'Michael Chen',
-        email: 'michael.chen@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-    ],
-  });
+  // Check if we already have users
+  const existingUsers = await prisma.user.findMany();
+  if (existingUsers.length > 0) {
+    console.log('Database already has users. Skipping user creation...');
+  } else {
+    // Create admin users
+    const adminUsers = await prisma.user.createMany({
+      data: [
+        {
+          name: 'John Doe',
+          email: 'john.doe@example.com',
+          password: await bcrypt.hash('password123', 10),
+          is_admin: true,
+        },
+        {
+          name: 'Sarah Williams',
+          email: 'sarah.williams@example.com',
+          password: await bcrypt.hash('password123', 10),
+          is_admin: true,
+        },
+        {
+          name: 'Michael Chen',
+          email: 'michael.chen@example.com',
+          password: await bcrypt.hash('password123', 10),
+          is_admin: false,
+        },
+      ],
+    });
 
-  // Create regular members (50 users)
-  const regularMembers = Array.from({ length: 50 }, () => ({
-    name: faker.person.fullName(),
-    email: faker.internet.email(),
-    password: 'password123', // We'll hash this later
-    is_admin: false,
-  }));
+    // Create regular members (50 users)
+    const regularMembers = Array.from({ length: 50 }, () => ({
+      name: faker.person.fullName(),
+      email: faker.internet.email(),
+      password: 'password123', // We'll hash this later
+      is_admin: false,
+    }));
 
-  // Hash passwords for regular members
-  const hashedRegularMembers = await Promise.all(
-    regularMembers.map(async (member) => ({
-      ...member,
-      password: await bcrypt.hash(member.password, 10),
-    }))
-  );
+    // Hash passwords for regular members
+    const hashedRegularMembers = await Promise.all(
+      regularMembers.map(async (member) => ({
+        ...member,
+        password: await bcrypt.hash(member.password, 10),
+      }))
+    );
 
-  // Create regular members in database
-  await prisma.user.createMany({
-    data: hashedRegularMembers,
-  });
+    // Create regular members in database
+    await prisma.user.createMany({
+      data: hashedRegularMembers,
+    });
+  }
 
-  // Get all users
+  // Get all users (existing or newly created)
   const allUsers = await prisma.user.findMany();
+
+  // Clear existing contributions
+  await prisma.contribution.deleteMany();
+  console.log('Cleared existing contributions...');
 
   // Create contributions for each user
   for (const user of allUsers) {
@@ -106,7 +116,8 @@ async function main() {
       return {
         user_id: user.id,
         amount,
-        month: date,
+        month: date.toLocaleString('default', { month: 'long' }),
+        year: date.getFullYear(),
         status,
         notes,
       };
@@ -119,8 +130,6 @@ async function main() {
 
   console.log('Database has been seeded with enhanced test data. 🌱');
   console.log('Created:', {
-    admins: 3,
-    regularMembers: 50,
     totalUsers: allUsers.length,
     contributionsPerUser: 24,
     totalContributions: allUsers.length * 24,

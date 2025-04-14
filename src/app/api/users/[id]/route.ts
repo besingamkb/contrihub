@@ -64,6 +64,7 @@ export async function GET(
             id: true,
             amount: true,
             month: true,
+            year: true,
             status: true,
             notes: true,
           },

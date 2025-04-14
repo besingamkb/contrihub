@@ -15,6 +15,7 @@ type UserData = {
     month: string
     status: string
     notes: string | null
+    year: string
   }>
 }
 
@@ -117,10 +118,7 @@ export default function ProfilePage() {
                   {userData.contributions.map((contribution) => (
                     <tr key={contribution.id}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(contribution.month).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'long'
-                        })}
+                        {`${contribution.month} ${contribution.year}`}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         ₱{contribution.amount.toLocaleString()}

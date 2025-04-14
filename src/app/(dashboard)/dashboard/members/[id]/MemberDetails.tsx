@@ -22,6 +22,7 @@ interface Contribution {
   status: string
   notes: string | null
   user_id: number
+  year: string
 }
 
 interface MemberDetailsProps {
@@ -258,10 +259,7 @@ export default function MemberDetails({ userId }: MemberDetailsProps) {
                 {user.contributions.map((contribution) => (
                   <tr key={contribution.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {new Date(contribution.month).toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'long'
-                      })}
+                      {`${contribution.month} ${contribution.year}`}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       ₱{contribution.amount.toLocaleString()}

@@ -18,6 +18,7 @@ interface RecentContribution {
   }
   amount: number
   month: string
+  year: number
   status: string
 }
 
@@ -181,7 +182,7 @@ export default function DashboardPage() {
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Member</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Month</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Month/year</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               </tr>
             </thead>
@@ -191,7 +192,7 @@ export default function DashboardPage() {
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{contribution.user.name}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">₱{contribution.amount.toLocaleString()}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {new Date(contribution.month).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                    {`${contribution.month}/${contribution.year}`}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
