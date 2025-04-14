@@ -1,5 +1,6 @@
 import { PrismaClient, Status } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import { faker } from '@faker-js/faker';
 
 const prisma = new PrismaClient();
 
@@ -8,10 +9,9 @@ async function main() {
   await prisma.contribution.deleteMany();
   await prisma.user.deleteMany();
 
-  // Create test users
-  const users = await prisma.user.createMany({
+  // Create admin users
+  const adminUsers = await prisma.user.createMany({
     data: [
-      // Admins
       {
         fullname: 'John Doe',
         email: 'john.doe@example.com',
@@ -28,172 +28,30 @@ async function main() {
         fullname: 'Michael Chen',
         email: 'michael.chen@example.com',
         password: await bcrypt.hash('password123', 10),
-        is_admin: true,
-      },
-      // Regular members
-      {
-        fullname: 'Jane Smith',
-        email: 'jane.smith@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Mike Johnson',
-        email: 'mike.johnson@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'David Brown',
-        email: 'david.brown@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Emily Davis',
-        email: 'emily.davis@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Robert Wilson',
-        email: 'robert.wilson@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Lisa Anderson',
-        email: 'lisa.anderson@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Michael Taylor',
-        email: 'michael.taylor@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Jennifer Martinez',
-        email: 'jennifer.martinez@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'James Wilson',
-        email: 'james.wilson@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Patricia Brown',
-        email: 'patricia.brown@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Thomas Garcia',
-        email: 'thomas.garcia@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Elizabeth Rodriguez',
-        email: 'elizabeth.rodriguez@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Charles Martinez',
-        email: 'charles.martinez@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Margaret Anderson',
-        email: 'margaret.anderson@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Joseph Taylor',
-        email: 'joseph.taylor@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Susan Thomas',
-        email: 'susan.thomas@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Daniel Hernandez',
-        email: 'daniel.hernandez@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Karen Moore',
-        email: 'karen.moore@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Paul Martin',
-        email: 'paul.martin@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Nancy Jackson',
-        email: 'nancy.jackson@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Kevin Thompson',
-        email: 'kevin.thompson@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Betty White',
-        email: 'betty.white@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Mark Lee',
-        email: 'mark.lee@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Sandra Harris',
-        email: 'sandra.harris@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Jason Clark',
-        email: 'jason.clark@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Donna Lewis',
-        email: 'donna.lewis@example.com',
-        password: await bcrypt.hash('password123', 10),
-        is_admin: false,
-      },
-      {
-        fullname: 'Jeffrey Robinson',
-        email: 'jeffrey.robinson@example.com',
-        password: await bcrypt.hash('password123', 10),
         is_admin: false,
       },
     ],
+  });
+
+  // Create regular members (50 users)
+  const regularMembers = Array.from({ length: 50 }, () => ({
+    fullname: faker.person.fullName(),
+    email: faker.internet.email(),
+    password: 'password123', // We'll hash this later
+    is_admin: false,
+  }));
+
+  // Hash passwords for regular members
+  const hashedRegularMembers = await Promise.all(
+    regularMembers.map(async (member) => ({
+      ...member,
+      password: await bcrypt.hash(member.password, 10),
+    }))
+  );
+
+  // Create regular members in database
+  await prisma.user.createMany({
+    data: hashedRegularMembers,
   });
 
   // Get all users
@@ -201,25 +59,74 @@ async function main() {
 
   // Create contributions for each user
   for (const user of allUsers) {
+    // Generate contributions for the past 24 months
+    const contributions = Array.from({ length: 24 }, (_, i) => {
+      const date = new Date();
+      date.setMonth(date.getMonth() - i);
+      date.setDate(1); // Set to first day of the month
+
+      // Different status probabilities based on time:
+      // Current month: 60% PENDING, 40% PAID
+      // Last 3 months: 70% PAID, 20% PENDING, 10% MISSED
+      // Older months: 85% PAID, 5% PENDING, 10% MISSED
+      let status;
+      if (i === 0) {
+        status = Math.random() < 0.6 ? Status.PENDING : Status.PAID;
+      } else if (i <= 3) {
+        const rand = Math.random();
+        status = rand < 0.7 ? Status.PAID : rand < 0.9 ? Status.PENDING : Status.MISSED;
+      } else {
+        const rand = Math.random();
+        status = rand < 0.85 ? Status.PAID : rand < 0.9 ? Status.PENDING : Status.MISSED;
+      }
+
+      // Generate more varied amounts
+      const baseAmount = 1000;
+      const variance = faker.number.int({ min: -200, max: 200 });
+      const amount = baseAmount + variance;
+
+      // Add notes for special cases
+      let notes = null;
+      if (status === Status.MISSED) {
+        notes = faker.helpers.arrayElement([
+          'Member requested extension',
+          'Payment failed',
+          'Member on leave',
+          'Will pay next month',
+          'Financial hardship reported'
+        ]);
+      } else if (Math.random() < 0.2) { // 20% chance for paid/pending to have notes
+        notes = faker.helpers.arrayElement([
+          'Paid via bank transfer',
+          'Payment confirmed',
+          'Partial payment received',
+          'Payment scheduled',
+          'Additional contribution included'
+        ]);
+      }
+
+      return {
+        user_id: user.id,
+        amount,
+        month: date,
+        status,
+        notes,
+      };
+    });
+
     await prisma.contribution.createMany({
-      data: [
-        {
-          user_id: user.id,
-          amount: 1000.00,
-          month: new Date('2024-01-01'),
-          status: Status.PAID,
-        },
-        {
-          user_id: user.id,
-          amount: 1000.00,
-          month: new Date('2024-02-01'),
-          status: Math.random() < 0.3 ? Status.PAID : Math.random() < 0.5 ? Status.PENDING : Status.MISSED,
-        },
-      ],
+      data: contributions,
     });
   }
 
-  console.log('Database has been seeded. 🌱');
+  console.log('Database has been seeded with enhanced test data. 🌱');
+  console.log('Created:', {
+    admins: 3,
+    regularMembers: 50,
+    totalUsers: allUsers.length,
+    contributionsPerUser: 24,
+    totalContributions: allUsers.length * 24,
+  });
 }
 
 main()

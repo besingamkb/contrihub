@@ -166,11 +166,11 @@ contrihub/
   ```
   Creates a new migration and applies it to the database. Use this during development.
 
-- `npx prisma migrate reset` - Reset the database
+- `npx prisma migrate reset --force` - Reset database and run seeder
   ```bash
-  npx prisma migrate reset
+  npx prisma migrate reset --force
   ```
-  Resets the database to the last successful migration.
+  Completely resets the database, runs all migrations, and executes the seeder automatically. Perfect for getting a fresh database with test data.
 
 - `npx prisma db push` - Push schema changes to the database
   ```bash
