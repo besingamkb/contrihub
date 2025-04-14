@@ -166,9 +166,9 @@ export default function MemberDetails({ userId }: MemberDetailsProps) {
       </div>
 
       {isEditing ? (
-        <form onSubmit={handleSubmit} className="bg-white shadow rounded-lg p-6 mb-8">
-          <div className="space-y-4">
-            <div>
+        <form onSubmit={handleSubmit} className="bg-white shadow rounded-lg p-8 mb-8">
+          <div className="space-y-6">
+            <div className="space-y-2">
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                 Full Name
               </label>
@@ -178,11 +178,11 @@ export default function MemberDetails({ userId }: MemberDetailsProps) {
                 name="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                className="mt-1 block w-full px-4 py-3 rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                 required
               />
             </div>
-            <div>
+            <div className="space-y-2">
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email
               </label>
@@ -192,29 +192,29 @@ export default function MemberDetails({ userId }: MemberDetailsProps) {
                 name="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                className="mt-1 block w-full px-4 py-3 rounded-md border border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                 required
               />
             </div>
-            <div>
-              <label className="flex items-center">
+            <div className="space-y-2">
+              <label className="flex items-center space-x-3">
                 <input
                   type="checkbox"
                   checked={formData.is_admin}
                   onChange={(e) => setFormData({ ...formData, is_admin: e.target.checked })}
-                  className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                 />
-                <span className="ml-2 text-sm text-gray-700">Admin</span>
+                <span className="text-sm font-medium text-gray-700">Admin User</span>
               </label>
             </div>
-          </div>
-          <div className="mt-6">
-            <button
-              type="submit"
-              className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Save Changes
-            </button>
+            <div className="pt-4 flex justify-end">
+              <button
+                type="submit"
+                className="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                Save Changes
+              </button>
+            </div>
           </div>
         </form>
       ) : (
