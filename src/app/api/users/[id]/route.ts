@@ -40,4 +40,37 @@ export async function GET(
       { status: 500 }
     )
   }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const userId = parseInt(params.id)
+    if (isNaN(userId)) {
+      return NextResponse.json(
+        { error: 'Invalid user ID' },
+        { status: 400 }
+      )
+    }
+
+    // First, delete all contributions associated with the user
+    await prisma.contribution.deleteMany({
+      where: { user_id: userId }
+    })
+
+    // Then delete the user
+    const user = await prisma.user.delete({
+      where: { id: userId }
+    })
+
+    return NextResponse.json({ message: 'User deleted successfully' })
+  } catch (error) {
+    console.error('Error deleting user:', error)
+    return NextResponse.json(
+      { error: 'Failed to delete user' },
+      { status: 500 }
+    )
+  }
 } 

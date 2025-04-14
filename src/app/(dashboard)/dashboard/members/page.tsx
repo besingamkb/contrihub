@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import ConfirmationModal from '@/components/ConfirmationModal'
+import Toast from '@/components/Toast'
 
 interface User {
   id: number
@@ -20,6 +22,17 @@ export default function MembersPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(5)
   const [pageSize, setPageSize] = useState(5)
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean
+    userId: number | null
+  }>({
+    isOpen: false,
+    userId: null
+  })
+  const [toast, setToast] = useState<{
+    message: string
+    type: 'success' | 'error'
+  } | null>(null)
 
   useEffect(() => {
     const user = localStorage.getItem('user')
@@ -75,6 +88,28 @@ export default function MembersPage() {
     setCurrentPage(1) // Reset to first page when changing page size
   }
 
+  const handleDeleteUser = async (userId: number) => {
+    try {
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) throw new Error('Failed to delete user')
+      
+      // Refresh users list
+      const usersResponse = await fetch('/api/users')
+      if (!usersResponse.ok) throw new Error('Failed to fetch users')
+      const usersData = await usersResponse.json()
+      setUsers(usersData)
+      
+      setDeleteModal({ isOpen: false, userId: null })
+      setToast({ message: 'User deleted successfully', type: 'success' })
+    } catch (err) {
+      console.error('Error deleting user:', err)
+      setToast({ message: 'Failed to delete user', type: 'error' })
+    }
+  }
+
   console.log('Debug info:', {
     totalUsers: users.length,
     filteredUsers: filteredUsers.length,
@@ -102,7 +137,7 @@ export default function MembersPage() {
   }
 
   return (
-    <div className="p-6">
+    <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Members</h1>
         <div className="flex items-center space-x-4">
@@ -154,6 +189,9 @@ export default function MembersPage() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Role
                 </th>
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
@@ -181,11 +219,24 @@ export default function MembersPage() {
                         </span>
                       )}
                     </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setDeleteModal({ isOpen: true, userId: user.id })
+                        }}
+                        className="text-red-600 hover:text-red-900 cursor-pointer"
+                      >
+                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={3} className="px-6 py-4 text-center text-sm text-gray-500">
+                  <td colSpan={4} className="px-6 py-4 text-center text-sm text-gray-500">
                     No members found
                   </td>
                 </tr>
@@ -298,6 +349,22 @@ export default function MembersPage() {
           </div>
         </div>
       </div>
+
+      <ConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, userId: null })}
+        onConfirm={() => deleteModal.userId && handleDeleteUser(deleteModal.userId)}
+        title="Delete Member"
+        message="Are you sure you want to delete this member? This action cannot be undone."
+      />
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   )
 } 
