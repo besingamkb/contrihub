@@ -81,7 +81,7 @@ export default function ProfilePage() {
         <div className="bg-white shadow rounded-lg p-6 mb-6">
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-medium text-gray-900">Full Name</h3>
+              <h3 className="text-lg font-medium text-gray-900">Name</h3>
               <p className="mt-1 text-sm text-gray-500">{userData.name}</p>
             </div>
             <div>

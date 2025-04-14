@@ -20,11 +20,7 @@ export async function GET() {
     // Get all contributions
     const contributions = await prisma.contribution.findMany({
       include: {
-        user: {
-          select: {
-            name: true
-          }
-        }
+        user: true
       },
       orderBy: {
         month: 'desc'
@@ -40,7 +36,7 @@ export async function GET() {
     const recentContributions = contributions.slice(0, 10).map(c => ({
       id: c.id,
       user: {
-        fullname: c.user.name // Map name to fullname for frontend compatibility
+        name: c.user.name
       },
       amount: Number(c.amount),
       month: c.month.toISOString(),
