@@ -42,6 +42,65 @@ export async function GET(
   }
 }
 
+export async function PUT(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const userId = parseInt(params.id)
+    if (isNaN(userId)) {
+      return NextResponse.json(
+        { error: 'Invalid user ID' },
+        { status: 400 }
+      )
+    }
+
+    const body = await request.json()
+    const { fullname, email, is_admin } = body
+
+    // Check if email is already taken by another user
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        email,
+        NOT: {
+          id: userId
+        }
+      }
+    })
+
+    if (existingUser) {
+      return NextResponse.json(
+        { error: 'Email is already taken' },
+        { status: 400 }
+      )
+    }
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        fullname,
+        email,
+        is_admin
+      },
+      include: {
+        contributions: {
+          orderBy: {
+            month: 'desc'
+          }
+        }
+      }
+    })
+
+    return NextResponse.json(updatedUser)
+  } catch (error) {
+    console.error('Error updating user:', error)
+    return NextResponse.json(
+      { error: 'Failed to update user' },
+      { status: 500 }
+    )
+  }
+}
+
 export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }
