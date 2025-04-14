@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     if (!user.is_admin) {
       const userContributions = await prisma.contribution.findMany({
         where: {
-          userId: user.id
+          user_id: user.id
         },
         orderBy: {
           month: 'desc'
@@ -28,7 +28,7 @@ export async function GET(request: Request) {
 
       const totalAmount = await prisma.contribution.aggregate({
         where: {
-          userId: user.id
+          user_id: user.id
         },
         _sum: {
           amount: true
