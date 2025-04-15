@@ -47,7 +47,13 @@ export async function GET(request: Request) {
       }
     })
 
-    return NextResponse.json(contributions)
+    // Convert Decimal to number for the response
+    const formattedContributions = contributions.map(contribution => ({
+      ...contribution,
+      amount: Number(contribution.amount)
+    }))
+
+    return NextResponse.json(formattedContributions)
   } catch (error) {
     console.error('Error fetching contributions:', error)
     return NextResponse.json(

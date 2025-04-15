@@ -115,10 +115,10 @@ export default function DataTable({
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {currentData.map((row, rowIndex) => (
-            <tr key={rowIndex} className="hover:bg-gray-50">
-              {columns.map((column) => (
+            <tr key={`row-${rowIndex}`} className="hover:bg-gray-50">
+              {columns.map((column, colIndex) => (
                 <td
-                  key={`${rowIndex}-${column.accessor}`}
+                  key={`${rowIndex}-${colIndex}-${column.accessor}`}
                   className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"
                 >
                   {column.render

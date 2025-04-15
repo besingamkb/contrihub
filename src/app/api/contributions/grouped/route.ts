@@ -69,7 +69,17 @@ export async function GET(request: Request) {
       return b.month.localeCompare(a.month)
     })
 
-    return NextResponse.json(result)
+    // Format the response to ensure all amounts are numbers and calculate paid members
+    const formattedResult = result.map(group => ({
+      ...group,
+      contributions: group.contributions.map(contribution => ({
+        ...contribution,
+        amount: Number(contribution.amount)
+      })),
+      paidMembers: group.contributions.filter(c => c.status === Status.PAID).length
+    }))
+
+    return NextResponse.json(formattedResult)
   } catch (error) {
     console.error('Error fetching grouped contributions:', error)
     return NextResponse.json(

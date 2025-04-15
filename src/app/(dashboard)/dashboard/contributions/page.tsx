@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { PlusIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, EyeIcon } from '@heroicons/react/24/outline'
 import DataTable from '@/components/DataTable'
 
 type GroupedContribution = {
@@ -53,8 +53,23 @@ export default function ContributionsPage() {
     },
     {
       header: 'Paid Member',
-      accessor: 'contributions',
-      render: (value: any[]) => value.length
+      accessor: 'paidMembers',
+      render: (value: number) => value
+    },
+    {
+      header: 'Actions',
+      accessor: 'actions',
+      render: (value: any, row: GroupedContribution) => {
+        const monthYear = `${row.month}-${row.year}`
+        return (
+          <Link 
+            href={`/dashboard/contributions/${monthYear}`}
+            className="text-blue-600 hover:text-blue-800"
+          >
+            <EyeIcon className="h-5 w-5" />
+          </Link>
+        )
+      }
     }
   ]
 
