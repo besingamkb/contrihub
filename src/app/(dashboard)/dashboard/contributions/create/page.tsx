@@ -1,8 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { PlusIcon } from '@heroicons/react/24/outline'
+
+interface User {
+  id: number
+  name: string
+  email: string
+}
 
 interface FormData {
   user_id: number
@@ -34,6 +40,34 @@ export default function CreateContributionPage() {
   const [errors, setErrors] = useState<FormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
+  const [users, setUsers] = useState<User[]>([])
+  const [searchTerm, setSearchTerm] = useState('')
+  const [showDropdown, setShowDropdown] = useState(false)
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const response = await fetch('/api/users')
+        const data = await response.json()
+        setUsers(data)
+      } catch (error) {
+        console.error('Error fetching users:', error)
+      }
+    }
+
+    fetchUsers()
+  }, [])
+
+  const filteredUsers = users.filter(user => 
+    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  const handleUserSelect = (user: User) => {
+    setFormData(prev => ({ ...prev, user_id: user.id }))
+    setSearchTerm(user.name)
+    setShowDropdown(false)
+  }
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
@@ -98,6 +132,14 @@ export default function CreateContributionPage() {
     }))
   }
 
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { name, value } = e.target
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -127,20 +169,38 @@ export default function CreateContributionPage() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-4">
-                <div>
-                  <label htmlFor="user_id" className="block text-sm font-medium text-gray-700">
-                    User ID
+                <div className="relative">
+                  <label htmlFor="user_search" className="block text-sm font-medium text-gray-700">
+                    Member
                   </label>
                   <input
-                    type="number"
-                    id="user_id"
-                    name="user_id"
-                    value={formData.user_id}
-                    onChange={handleChange}
+                    type="text"
+                    id="user_search"
+                    value={searchTerm}
+                    onChange={(e) => {
+                      setSearchTerm(e.target.value)
+                      setShowDropdown(true)
+                    }}
+                    onFocus={() => setShowDropdown(true)}
                     className={`mt-1 block w-full px-3 py-2 border ${
                       errors.user_id ? 'border-red-300' : 'border-gray-300'
                     } rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
+                    placeholder="Search for a member..."
                   />
+                  {showDropdown && filteredUsers.length > 0 && (
+                    <div className="absolute z-10 mt-1 w-full bg-white shadow-lg rounded-md border border-gray-300 max-h-60 overflow-auto">
+                      {filteredUsers.map((user) => (
+                        <div
+                          key={user.id}
+                          className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                          onClick={() => handleUserSelect(user)}
+                        >
+                          <div className="font-medium">{user.name}</div>
+                          <div className="text-sm text-gray-500">{user.email}</div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                   {errors.user_id && (
                     <p className="mt-2 text-sm text-red-600">{errors.user_id}</p>
                   )}
@@ -237,13 +297,14 @@ export default function CreateContributionPage() {
                   <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
                     Notes
                   </label>
-                  <input
-                    type="text"
+                  <textarea
                     id="notes"
                     name="notes"
                     value={formData.notes}
-                    onChange={handleChange}
+                    onChange={handleTextareaChange}
+                    rows={4}
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                    placeholder="Enter any additional notes..."
                   />
                 </div>
               </div>
