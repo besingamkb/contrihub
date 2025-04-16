@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import type { PluginDef } from '@fullcalendar/core'
 import { CalendarEvent, FullCalendarEvent } from '@/types/calendar'
+import EventDetailsModal from '@/components/calendar/EventDetailsModal'
 
 // Dynamically import FullCalendar with no SSR
 const FullCalendar = dynamic(() => import('@fullcalendar/react'), {
@@ -16,6 +17,8 @@ export default function EventsPage() {
   const [events, setEvents] = useState<FullCalendarEvent[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [selectedEvent, setSelectedEvent] = useState<FullCalendarEvent | null>(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   useEffect(() => {
     setMounted(true)
@@ -65,6 +68,14 @@ export default function EventsPage() {
     }
   }, [mounted])
 
+  const handleEventClick = (info: any) => {
+    const event = events.find(e => e.id === info.event.id)
+    if (event) {
+      setSelectedEvent(event)
+      setIsModalOpen(true)
+    }
+  }
+
   if (!mounted || plugins.length === 0) {
     return (
       <div className="p-6">
@@ -107,8 +118,15 @@ export default function EventsPage() {
           editable={false}
           dayMaxEvents={true}
           height="auto"
+          eventClick={handleEventClick}
         />
       </div>
+
+      <EventDetailsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        event={selectedEvent}
+      />
     </div>
   )
 } 

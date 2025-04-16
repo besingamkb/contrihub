@@ -38,7 +38,8 @@ export interface FullCalendarEvent {
       id: string;
       name: string;
       email: string;
-    }
+    };
+    status: 'ACCEPTED' | 'DECLINED' | 'PENDING' | 'TENTATIVE';
   }[];
   creator?: {
     id: string;

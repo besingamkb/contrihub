@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { PlusIcon, EyeIcon } from '@heroicons/react/24/outline'
+import { PlusIcon, FolderOpenIcon } from '@heroicons/react/24/outline'
 import DataTable from '@/components/DataTable'
 
 type GroupedContribution = {
@@ -66,7 +66,7 @@ export default function ContributionsPage() {
             href={`/dashboard/contributions/${monthYear}`}
             className="text-blue-600 hover:text-blue-800"
           >
-            <EyeIcon className="h-5 w-5" />
+            <FolderOpenIcon className="h-5 w-5" />
           </Link>
         )
       }
