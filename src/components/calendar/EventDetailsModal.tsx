@@ -1,17 +1,37 @@
 import { Dialog, Transition } from '@headlessui/react';
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import { FullCalendarEvent } from '@/types/calendar';
 import { format } from 'date-fns';
-import { CheckCircleIcon, XCircleIcon, ClockIcon, QuestionMarkCircleIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, XCircleIcon, ClockIcon, QuestionMarkCircleIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { useSession } from 'next-auth/react';
 
 interface EventDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   event: FullCalendarEvent | null;
+  onDelete?: (eventId: string) => Promise<void>;
 }
 
-export default function EventDetailsModal({ isOpen, onClose, event }: EventDetailsModalProps) {
+export default function EventDetailsModal({ isOpen, onClose, event, onDelete }: EventDetailsModalProps) {
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { data: session } = useSession();
+  const isCreator = event?.creator?.id?.toString() === session?.user?.id?.toString();
+
   if (!event) return null;
+
+  const handleDelete = async () => {
+    if (!onDelete) return;
+    
+    setIsDeleting(true);
+    try {
+      await onDelete(event.id);
+      onClose();
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -30,7 +50,7 @@ export default function EventDetailsModal({ isOpen, onClose, event }: EventDetai
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={onClose}>
+      <Dialog as="div" className="relative z-40" onClose={onClose}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -54,12 +74,24 @@ export default function EventDetailsModal({ isOpen, onClose, event }: EventDetai
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white/90 backdrop-blur-sm p-6 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                 <Dialog.Title
-                  as="h3"
-                  className="text-lg font-medium leading-6 text-gray-900"
+                  as="div"
+                  className="flex justify-between items-center"
                 >
-                  {event.title}
+                  <h3 className="text-lg font-medium leading-6 text-gray-900">
+                    {event.title}
+                  </h3>
+                  {onDelete && isCreator && (
+                    <button
+                      onClick={handleDelete}
+                      disabled={isDeleting}
+                      className="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-red-700 bg-red-100 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                    >
+                      <TrashIcon className="h-4 w-4 mr-1" />
+                      {isDeleting ? 'Deleting...' : 'Delete'}
+                    </button>
+                  )}
                 </Dialog.Title>
 
                 <div className="mt-4 space-y-4">

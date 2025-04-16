@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { UpdateCalendarEventInput } from '@/types/calendar';
+import { NextRequest } from 'next/server';
 
 export async function GET(
   request: Request,
@@ -142,7 +143,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -151,9 +152,18 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Get the event ID from the URL
+    const url = new URL(request.url);
+    const pathSegments = url.pathname.split('/');
+    const eventId = Number(pathSegments[pathSegments.length - 1]);
+
+    if (isNaN(eventId)) {
+      return NextResponse.json({ error: 'Invalid event ID' }, { status: 400 });
+    }
+
     const event = await prisma.calendarEvent.findUnique({
       where: {
-        id: parseInt(params.id),
+        id: eventId,
       },
     });
 
@@ -161,13 +171,14 @@ export async function DELETE(
       return NextResponse.json({ error: 'Event not found' }, { status: 404 });
     }
 
-    if (event.created_by !== session.user.id) {
+    if (event.created_by !== parseInt(session.user.id)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
+    // Delete the event and its associated attendees
     await prisma.calendarEvent.delete({
       where: {
-        id: parseInt(params.id),
+        id: eventId,
       },
     });
 

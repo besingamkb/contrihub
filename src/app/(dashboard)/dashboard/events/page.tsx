@@ -8,6 +8,7 @@ import EventDetailsModal from '@/components/calendar/EventDetailsModal'
 import CreateEventModal from '@/components/calendar/CreateEventModal'
 import { PlusIcon } from '@heroicons/react/24/outline'
 import { User } from '@prisma/client'
+import Toast from '@/components/Toast'
 
 // Dynamically import FullCalendar with no SSR
 const FullCalendar = dynamic(() => import('@fullcalendar/react'), {
@@ -24,6 +25,10 @@ export default function EventsPage() {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [users, setUsers] = useState<User[]>([])
+  const [toast, setToast] = useState<{
+    message: string
+    type: 'success' | 'error'
+  } | null>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -134,6 +139,26 @@ export default function EventsPage() {
     }
   };
 
+  const handleDeleteEvent = async (eventId: string) => {
+    try {
+      const response = await fetch(`/api/calendar/${eventId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete event');
+      }
+
+      // Remove the event from the calendar
+      setEvents(prevEvents => prevEvents.filter(event => event.id !== eventId));
+      setToast({ message: 'Event deleted successfully', type: 'success' });
+    } catch (err) {
+      console.error('Error deleting event:', err);
+      setToast({ message: 'Failed to delete event', type: 'error' });
+      throw err;
+    }
+  };
+
   if (!mounted || plugins.length === 0) {
     return (
       <div className="p-6">
@@ -193,6 +218,7 @@ export default function EventsPage() {
         isOpen={isDetailsModalOpen}
         onClose={() => setIsDetailsModalOpen(false)}
         event={selectedEvent}
+        onDelete={handleDeleteEvent}
       />
 
       <CreateEventModal
@@ -201,6 +227,14 @@ export default function EventsPage() {
         onCreateEvent={handleCreateEvent}
         users={users}
       />
+
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
     </div>
   )
 } 
