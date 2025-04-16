@@ -15,7 +15,8 @@ export interface CalendarEvent {
       id: string;
       name: string;
       email: string;
-    }
+    };
+    status: AttendeeStatus;
   }[];
   creator?: {
     id: string;

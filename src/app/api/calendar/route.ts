@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { CreateCalendarEventInput } from '@/types/calendar';
+import { AttendeeStatus } from '@prisma/client';
 
 export async function GET(request: Request) {
   try {
@@ -78,18 +79,18 @@ export async function POST(request: Request) {
         start_time: new Date(start_time),
         end_time: new Date(end_time),
         location,
-        created_by: session.user.id,
+        created_by: parseInt(session.user.id),
         attendees: {
           create: [
             // Creator is always an attendee
             {
-              user_id: session.user.id,
-              status: 'ACCEPTED',
+              user_id: parseInt(session.user.id),
+              status: AttendeeStatus.ACCEPTED,
             },
             // Add other attendees if provided
             ...(attendeeIds || []).map((userId) => ({
               user_id: userId,
-              status: 'PENDING',
+              status: AttendeeStatus.PENDING,
             })),
           ],
         },
