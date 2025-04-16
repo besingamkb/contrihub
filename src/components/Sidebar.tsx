@@ -101,6 +101,15 @@ export default function Sidebar() {
       <div className="p-4 border-t">
         <div className="mb-4 px-4 py-2 text-sm text-gray-600">
           Signed in as: {session?.user?.name}
+          <div className="mt-2">
+            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+              session?.user?.is_admin 
+                ? 'bg-purple-100 text-purple-800' 
+                : 'bg-gray-100 text-gray-800'
+            }`}>
+              {session?.user?.is_admin ? 'Admin' : 'Member'}
+            </span>
+          </div>
         </div>
         <button
           onClick={handleLogout}
