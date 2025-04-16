@@ -1,4 +1,4 @@
-import { PrismaClient, Status } from '@prisma/client';
+import { PrismaClient, Status, AttendeeStatus, User } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { faker } from '@faker-js/faker';
 
@@ -59,7 +59,7 @@ async function main() {
   }
 
   // Get all users (existing or newly created)
-  const allUsers = await prisma.user.findMany();
+  const allUsers: User[] = await prisma.user.findMany();
 
   // Clear existing contributions
   await prisma.contribution.deleteMany();
@@ -134,6 +134,113 @@ async function main() {
     contributionsPerUser: 24,
     totalContributions: allUsers.length * 24,
   });
+
+  // Clear existing calendar events
+  await prisma.calendarEventAttendee.deleteMany();
+  await prisma.calendarEvent.deleteMany();
+  console.log('Cleared existing calendar events...');
+
+  // Create calendar events
+  const eventTypes = [
+    'Monthly Meeting',
+    'Annual General Assembly',
+    'Special Project Discussion',
+    'Team Building',
+    'Training Session',
+    'Community Outreach',
+    'Fundraising Event',
+    'Board Meeting',
+    'Workshop',
+    'Social Gathering',
+    'Committee Meeting',
+    'Volunteer Training',
+    'Member Orientation',
+    'Budget Planning',
+    'Strategic Planning',
+    'Community Service',
+    'Networking Event',
+    'Award Ceremony',
+    'Annual Review',
+    'Project Launch'
+  ] as const;
+
+  const locations = [
+    'Main Hall',
+    'Conference Room A',
+    'Community Center',
+    'Online Meeting',
+    'Outdoor Park',
+    'Restaurant',
+    'Hotel Conference Room',
+    'Member\'s Residence',
+    'Sports Complex',
+    'Cultural Center',
+    'Library',
+    'School Auditorium',
+    'Town Hall',
+    'Beach Resort',
+    'Garden Venue'
+  ] as const;
+
+  // Helper function to generate a random date within a specific month
+  const generateRandomDate = (year: number, month: number) => {
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0);
+    const randomDate = new Date(startDate.getTime() + Math.random() * (endDate.getTime() - startDate.getTime()));
+    randomDate.setHours(9 + Math.floor(Math.random() * 8), 0, 0, 0); // Random time between 9 AM and 5 PM
+    return randomDate;
+  };
+
+  // Create events for March, April, and May 2025
+  const months = [3, 4, 5]; // March, April, May
+  const eventsPerMonth = 15; // 15 events per month
+
+  for (const month of months) {
+    for (let i = 0; i < eventsPerMonth; i++) {
+      const startDate = generateRandomDate(2025, month);
+      const endDate = new Date(startDate);
+      endDate.setHours(startDate.getHours() + Math.floor(Math.random() * 3) + 1); // Duration between 1-4 hours
+
+      const creator: User = faker.helpers.arrayElement(allUsers);
+      
+      // Get random users excluding the creator
+      const availableUsers = allUsers.filter(user => user.id !== creator.id);
+      const numAttendees = faker.number.int({ min: 5, max: Math.min(15, availableUsers.length) });
+      const randomAttendees = faker.helpers.shuffle(availableUsers).slice(0, numAttendees);
+
+      const event = await prisma.calendarEvent.create({
+        data: {
+          title: faker.helpers.arrayElement(eventTypes),
+          description: faker.lorem.paragraph(),
+          start_time: startDate,
+          end_time: endDate,
+          location: faker.helpers.arrayElement(locations),
+          created_by: creator.id,
+          attendees: {
+            create: [
+              // Creator is always an attendee
+              {
+                user_id: creator.id,
+                status: AttendeeStatus.ACCEPTED
+              },
+              // Add random attendees
+              ...randomAttendees.map(user => ({
+                user_id: user.id,
+                status: faker.helpers.arrayElement([
+                  AttendeeStatus.PENDING,
+                  AttendeeStatus.ACCEPTED,
+                  AttendeeStatus.DECLINED,
+                  AttendeeStatus.TENTATIVE
+                ])
+              }))
+            ]
+          }
+        }
+      });
+    }
+  }
+
+  console.log('Created calendar events with attendees');
 }
 
 main()

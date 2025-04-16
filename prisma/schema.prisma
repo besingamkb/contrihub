@@ -9,6 +9,11 @@ generator client {
   output   = "../node_modules/.prisma/client"
 }
 
+generator erd {
+  provider = "prisma-erd-generator"
+  theme    = "forest"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -27,6 +32,8 @@ model User {
   accounts      Account[]
   sessions      Session[]
   contributions Contribution[]
+  createdEvents CalendarEvent[] @relation("CreatedEvents")
+  eventAttendees CalendarEventAttendee[] @relation("EventAttendees")
 }
 
 model Account {
@@ -77,4 +84,45 @@ enum Status {
   PENDING
   PAID
   MISSED
+}
+
+model CalendarEvent {
+  id          Int                     @id @default(autoincrement())
+  title       String
+  description String?                 @db.Text
+  start_time  DateTime
+  end_time    DateTime
+  location    String?
+  created_by  Int
+  created_at  DateTime                @default(now())
+  updated_at  DateTime                @updatedAt
+  creator     User                    @relation("CreatedEvents", fields: [created_by], references: [id], onDelete: Cascade)
+  attendees   CalendarEventAttendee[]
+
+  @@index([created_by])
+  @@index([start_time])
+  @@index([end_time])
+}
+
+model CalendarEventAttendee {
+  id              Int           @id @default(autoincrement())
+  event_id        Int
+  user_id         Int
+  status          AttendeeStatus @default(PENDING)
+  created_at      DateTime      @default(now())
+  updated_at      DateTime      @updatedAt
+  event           CalendarEvent @relation(fields: [event_id], references: [id], onDelete: Cascade)
+  user            User          @relation("EventAttendees", fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@unique([event_id, user_id])
+  @@index([event_id])
+  @@index([user_id])
+  @@index([status])
+}
+
+enum AttendeeStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  TENTATIVE
 }
