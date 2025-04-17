@@ -8,7 +8,9 @@ export default withAuth(
     const path = req.nextUrl.pathname
 
     // Protect admin routes
-    if (path.startsWith('/dashboard/members') || path.startsWith('/dashboard/reports')) {
+    if (path.startsWith('/dashboard/members') || 
+        path.startsWith('/dashboard/reports') || 
+        path.startsWith('/dashboard/inquiries')) {
       if (!isAdmin) {
         return NextResponse.redirect(new URL('/dashboard', req.url))
       }

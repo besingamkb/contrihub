@@ -4,6 +4,64 @@ import { faker } from '@faker-js/faker';
 
 const prisma = new PrismaClient();
 
+const inquiries = Array.from({ length: 50 }, () => ({
+  name: faker.person.fullName(),
+  email: faker.internet.email(),
+  subject: faker.helpers.arrayElement([
+    'Question about contribution process',
+    'Technical issue with submission',
+    'Feature request for contribution dashboard',
+    'Question about contribution guidelines',
+    'Issue with contribution review',
+    'Request for contribution feedback',
+    'Question about contribution rewards',
+    'Technical support needed',
+    'Suggestion for contribution workflow',
+    'Question about contribution scope',
+    'Issue with contribution statistics',
+    'Request for contribution mentorship',
+    'Question about contribution documentation',
+    'Issue with contribution notifications',
+    'Suggestion for contribution templates',
+    'Question about contribution review process',
+    'Technical issue with contribution editor',
+    'Request for contribution guidelines update',
+    'Question about contribution metrics',
+    'Issue with contribution history'
+  ]),
+  message: faker.helpers.arrayElement([
+    // Long technical questions
+    `${faker.lorem.paragraphs(3)}\n\n${faker.lorem.paragraphs(2)}\n\n${faker.lorem.paragraphs(2)}`,
+    
+    // Detailed bug reports
+    `I'm experiencing the following issue:\n\n${faker.lorem.paragraphs(2)}\n\nSteps to reproduce:\n1. ${faker.lorem.sentence()}\n2. ${faker.lorem.sentence()}\n3. ${faker.lorem.sentence()}\n\nExpected behavior:\n${faker.lorem.paragraph()}\n\nActual behavior:\n${faker.lorem.paragraph()}\n\nAdditional context:\n${faker.lorem.paragraphs(2)}`,
+    
+    // Feature requests
+    `I would like to suggest the following feature:\n\n${faker.lorem.paragraphs(2)}\n\nBenefits:\n1. ${faker.lorem.sentence()}\n2. ${faker.lorem.sentence()}\n3. ${faker.lorem.sentence()}\n\nImplementation considerations:\n${faker.lorem.paragraphs(2)}`,
+    
+    // Documentation questions
+    `I have some questions about the documentation:\n\n${faker.lorem.paragraphs(2)}\n\nSpecific areas of confusion:\n1. ${faker.lorem.sentence()}\n2. ${faker.lorem.sentence()}\n3. ${faker.lorem.sentence()}\n\nSuggested improvements:\n${faker.lorem.paragraphs(2)}`,
+    
+    // Process inquiries
+    `I need clarification about the following process:\n\n${faker.lorem.paragraphs(2)}\n\nCurrent understanding:\n${faker.lorem.paragraph()}\n\nQuestions:\n1. ${faker.lorem.sentence()}\n2. ${faker.lorem.sentence()}\n3. ${faker.lorem.sentence()}\n\nAdditional context:\n${faker.lorem.paragraphs(2)}`,
+    
+    // Technical support requests
+    `I'm encountering technical difficulties:\n\n${faker.lorem.paragraphs(2)}\n\nEnvironment details:\n- OS: ${faker.helpers.arrayElement(['Windows', 'macOS', 'Linux'])}\n- Browser: ${faker.helpers.arrayElement(['Chrome', 'Firefox', 'Safari', 'Edge'])}\n- Version: ${faker.system.semver()}\n\nError message:\n${faker.lorem.paragraph()}\n\nSteps taken:\n1. ${faker.lorem.sentence()}\n2. ${faker.lorem.sentence()}\n3. ${faker.lorem.sentence()}\n\nAdditional information:\n${faker.lorem.paragraphs(2)}`,
+    
+    // Feedback and suggestions
+    `I have some feedback about the current system:\n\n${faker.lorem.paragraphs(2)}\n\nPositive aspects:\n1. ${faker.lorem.sentence()}\n2. ${faker.lorem.sentence()}\n3. ${faker.lorem.sentence()}\n\nAreas for improvement:\n1. ${faker.lorem.sentence()}\n2. ${faker.lorem.sentence()}\n3. ${faker.lorem.sentence()}\n\nDetailed suggestions:\n${faker.lorem.paragraphs(2)}`,
+    
+    // Complex technical discussions
+    `I'm working on a complex implementation and need guidance:\n\n${faker.lorem.paragraphs(2)}\n\nTechnical details:\n${faker.lorem.paragraphs(3)}\n\nCurrent approach:\n${faker.lorem.paragraphs(2)}\n\nChallenges encountered:\n1. ${faker.lorem.sentence()}\n2. ${faker.lorem.sentence()}\n3. ${faker.lorem.sentence()}\n\nQuestions:\n${faker.lorem.paragraphs(2)}`,
+    
+    // Integration questions
+    `I'm trying to integrate with your system:\n\n${faker.lorem.paragraphs(2)}\n\nIntegration requirements:\n1. ${faker.lorem.sentence()}\n2. ${faker.lorem.sentence()}\n3. ${faker.lorem.sentence()}\n\nCurrent implementation:\n${faker.lorem.paragraphs(2)}\n\nIssues encountered:\n${faker.lorem.paragraphs(2)}`,
+    
+    // Performance concerns
+    `I've noticed some performance issues:\n\n${faker.lorem.paragraphs(2)}\n\nPerformance metrics:\n- Response time: ${faker.number.int({ min: 100, max: 5000 })}ms\n- Throughput: ${faker.number.int({ min: 10, max: 100 })} requests/second\n- Error rate: ${faker.number.float({ min: 0, max: 5, fractionDigits: 2 })}%\n\nEnvironment details:\n${faker.lorem.paragraph()}\n\nSteps to reproduce:\n${faker.lorem.paragraphs(2)}`
+  ])
+}));
+
 async function main() {
   console.log('Starting database seeding...');
 
@@ -125,6 +183,13 @@ async function main() {
 
     await prisma.contribution.createMany({
       data: contributions,
+    });
+  }
+
+  // Create inquiries
+  for (const inquiry of inquiries) {
+    await prisma.inquiry.create({
+      data: inquiry
     });
   }
 

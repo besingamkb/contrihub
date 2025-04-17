@@ -52,6 +52,16 @@ export default function Sidebar() {
               Contributions
             </Link>
             <Link
+              href="/dashboard/inquiries"
+              className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
+                pathname === '/dashboard/inquiries'
+                  ? 'bg-indigo-100 text-indigo-700'
+                  : 'text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              Inquiries
+            </Link>
+            <Link
               href="/dashboard/events"
               className={`flex items-center px-4 py-2 text-sm font-medium rounded-md ${
                 pathname === '/dashboard/events'

@@ -15,6 +15,7 @@ interface DataTableProps {
   itemsPerPage?: number
   className?: string
   searchableColumns?: string[]
+  onRowClick?: (row: any) => void
 }
 
 export default function DataTable({
@@ -22,25 +23,16 @@ export default function DataTable({
   data,
   itemsPerPage: initialItemsPerPage = 10,
   className = '',
-  searchableColumns = []
+  searchableColumns = [],
+  onRowClick
 }: DataTableProps) {
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage, setItemsPerPage] = useState(initialItemsPerPage)
   const [searchTerm, setSearchTerm] = useState('')
-
-  // Filter data based on search term
-  const filteredData = data.filter(item => {
-    if (!searchTerm) return true
-    return searchableColumns.some(column => {
-      const value = item[column]
-      return value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
-    })
-  })
-
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const currentData = filteredData.slice(startIndex, endIndex)
+  const [sortConfig, setSortConfig] = useState<{
+    key: string
+    direction: 'asc' | 'desc'
+  } | null>(null)
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
@@ -86,6 +78,46 @@ export default function DataTable({
     return pageNumbers
   }
 
+  const handleSort = (key: string) => {
+    if (sortConfig?.key === key) {
+      setSortConfig({
+        ...sortConfig,
+        direction: sortConfig.direction === 'asc' ? 'desc' : 'asc'
+      })
+    } else {
+      setSortConfig({
+        key,
+        direction: 'asc'
+      })
+    }
+  }
+
+  // First, apply filtering
+  const filteredData = data.filter(item => {
+    if (!searchTerm) return true
+    return searchableColumns.some(column => {
+      const value = item[column]
+      return value && value.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    })
+  })
+
+  // Then, apply sorting
+  const sortedData = sortConfig
+    ? [...filteredData].sort((a, b) => {
+      const aValue = a[sortConfig.key]
+      const bValue = b[sortConfig.key]
+      if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1
+      if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1
+      return 0
+    })
+    : filteredData
+
+  // Calculate pagination
+  const totalPages = Math.ceil(sortedData.length / itemsPerPage)
+  const startIndex = (currentPage - 1) * itemsPerPage
+  const endIndex = Math.min(startIndex + itemsPerPage, sortedData.length)
+  const currentData = sortedData.slice(startIndex, endIndex)
+
   return (
     <div className={`overflow-x-auto ${className}`}>
       {searchableColumns.length > 0 && (
@@ -106,16 +138,29 @@ export default function DataTable({
             {columns.map((column) => (
               <th
                 key={column.accessor}
-                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                scope="col"
+                className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:text-gray-700"
+                onClick={() => handleSort(column.accessor)}
               >
-                {column.header}
+                <div className="flex items-center space-x-1">
+                  <span>{column.header}</span>
+                  {sortConfig?.key === column.accessor && (
+                    <span>
+                      {sortConfig.direction === 'asc' ? '↑' : '↓'}
+                    </span>
+                  )}
+                </div>
               </th>
             ))}
           </tr>
         </thead>
         <tbody className="bg-white divide-y divide-gray-200">
           {currentData.map((row, rowIndex) => (
-            <tr key={`row-${rowIndex}`} className="hover:bg-gray-50">
+            <tr
+              key={`row-${rowIndex}`}
+              onClick={() => onRowClick?.(row)}
+              className={`${onRowClick ? 'cursor-pointer hover:bg-gray-50' : ''}`}
+            >
               {columns.map((column, colIndex) => (
                 <td
                   key={`${rowIndex}-${colIndex}-${column.accessor}`}
@@ -153,10 +198,8 @@ export default function DataTable({
             <div className="flex items-center space-x-4">
               <p className="text-sm text-gray-700">
                 Showing <span className="font-medium">{startIndex + 1}</span> to{' '}
-                <span className="font-medium">
-                  {Math.min(endIndex, filteredData.length)}
-                </span>{' '}
-                of <span className="font-medium">{filteredData.length}</span> results
+                <span className="font-medium">{endIndex}</span>{' '}
+                of <span className="font-medium">{sortedData.length}</span> results
               </p>
               <div className="flex items-center space-x-2">
                 <label htmlFor="itemsPerPage" className="text-sm text-gray-700">
