@@ -44,7 +44,18 @@ export default withAuth(
   },
   {
     callbacks: {
-      authorized: ({ token }) => !!token
+      authorized: ({ token, req }) => {
+        const path = req.nextUrl.pathname
+        const method = req.method
+
+        // Allow unauthenticated access to /api/inquiries POST endpoint
+        if (path === '/api/inquiries' && method === 'POST') {
+          return true
+        }
+
+        // Require authentication for all other routes
+        return !!token
+      }
     },
     pages: {
       signIn: '/login',
