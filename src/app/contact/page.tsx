@@ -12,6 +12,19 @@ import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 
 export default function ContactPage() {
+  const subjectOptions = [
+    { value: 'basic-question', label: 'Basic question about the organization', placeholder: 'Please describe your question about our organization...' },
+    { value: 'join-cofa', label: 'How to join COFA', placeholder: 'Tell us why you want to join COFA and any relevant experience...' },
+    { value: 'collaboration', label: 'Collaboration opportunities', placeholder: 'Describe your collaboration proposal and potential benefits...' },
+    { value: 'sponsorship', label: 'Sponsorship inquiries', placeholder: 'Please provide details about your sponsorship interest...' },
+    { value: 'account-access', label: 'Account access problems', placeholder: 'Describe the issues you are experiencing with your account...' },
+    { value: 'bug-report', label: 'Bug reports', placeholder: 'Please provide detailed steps to reproduce the bug...' },
+    { value: 'service-feedback', label: 'Service feedback', placeholder: 'Share your experience with our services...' },
+    { value: 'feature-request', label: 'Feature requests', placeholder: 'Describe the feature you would like to see...' },
+    { value: 'complaints', label: 'Complaints & Concerns', placeholder: 'Please describe your concerns in detail...' },
+    { value: 'billing', label: 'Billing & Financial', placeholder: 'Please provide details about your billing inquiry.' }
+  ];
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -19,18 +32,25 @@ export default function ContactPage() {
     message: ''
   });
 
+  const [messagePlaceholder, setMessagePlaceholder] = useState('Type your message here...');
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle form submission here
     console.log('Form submitted:', formData);
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
+
+    if (name === 'subject') {
+      const selectedOption = subjectOptions.find(option => option.value === value);
+      setMessagePlaceholder(selectedOption?.placeholder || 'Type your message here...');
+    }
   };
 
   return (
@@ -166,16 +186,21 @@ export default function ContactPage() {
                 <label htmlFor="subject" className="block text-sm font-medium text-gray-700">
                   Subject
                 </label>
-                <input
-                  type="text"
+                <select
                   name="subject"
                   id="subject"
                   value={formData.subject}
                   onChange={handleChange}
-                  placeholder="What is this regarding?"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2"
                   required
-                />
+                >
+                  <option value="">Select a subject</option>
+                  {subjectOptions.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               <div>
@@ -188,10 +213,17 @@ export default function ContactPage() {
                   rows={4}
                   value={formData.message}
                   onChange={handleChange}
-                  placeholder="Type your message here..."
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2"
+                  placeholder={messagePlaceholder}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 px-4 py-2 text-base"
                   required
                 />
+                {formData.subject === 'billing' && (
+                  <div className="mt-2 px-4 py-2 bg-red-100 border-l-4 border-red-500 rounded-md">
+                    <p className="text-sm text-red-700">
+                      <span className="font-medium">IMPORTANT:</span> For your security, please DO NOT include any sensitive account information, passwords, or payment details in your message.
+                    </p>
+                  </div>
+                )}
               </div>
 
               <div>
@@ -210,4 +242,4 @@ export default function ContactPage() {
       <Footer />
     </div>
   );
-} 
+}
