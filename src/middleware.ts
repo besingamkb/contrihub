@@ -6,6 +6,7 @@ export default withAuth(
     const token = req.nextauth.token
     const isAdmin = token?.is_admin === true
     const path = req.nextUrl.pathname
+    const method = req.method
 
     // Protect admin routes
     if (path.startsWith('/dashboard/members') || 
@@ -20,6 +21,11 @@ export default withAuth(
     if (path.startsWith('/api')) {
       // Allow auth-related API routes
       if (path.startsWith('/api/auth')) {
+        return NextResponse.next()
+      }
+
+      // Allow unauthenticated POST requests to /api/inquiries
+      if (path === '/api/inquiries' && method === 'POST') {
         return NextResponse.next()
       }
 

@@ -1,7 +1,18 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
+import { z } from 'zod';
 
-const prisma = new PrismaClient();
+// Rate limiting configuration
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute in milliseconds
+const MAX_REQUESTS_PER_WINDOW = 1; // Maximum 1 request per minute
+const submissionTimes = new Map<string, { count: number; timestamp: number }>();
+
+const inquirySchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email address'),
+  subject: z.string().min(1, 'Subject is required'),
+  message: z.string().min(1, 'Message is required'),
+});
 
 export async function GET() {
   try {
@@ -31,27 +42,60 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { name, email, subject, message } = body;
+    // Get client IP and check rate limit
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    const ip = forwardedFor ? forwardedFor.split(',')[0] : 'unknown';
+    const now = Date.now();
 
-    if (!name || !email || !subject || !message) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
+    // Clean up old entries first
+    for (const [storedIp, data] of submissionTimes.entries()) {
+      if (now - data.timestamp > RATE_LIMIT_WINDOW) {
+        submissionTimes.delete(storedIp);
+      }
     }
+
+    // Check rate limit
+    const userData = submissionTimes.get(ip);
+    if (userData) {
+      if (now - userData.timestamp < RATE_LIMIT_WINDOW) {
+        if (userData.count >= MAX_REQUESTS_PER_WINDOW) {
+          const timeLeft = Math.ceil((RATE_LIMIT_WINDOW - (now - userData.timestamp)) / 1000);
+          return NextResponse.json(
+            { error: `Too many requests. Please wait ${timeLeft} seconds before submitting another inquiry` },
+            { status: 429 }
+          );
+        }
+        // Update count for existing user
+        submissionTimes.set(ip, { count: userData.count + 1, timestamp: userData.timestamp });
+      } else {
+        // Reset count for new window
+        submissionTimes.set(ip, { count: 1, timestamp: now });
+      }
+    } else {
+      // First request from this IP
+      submissionTimes.set(ip, { count: 1, timestamp: now });
+    }
+
+    const body = await request.json();
+    const validatedData = inquirySchema.parse(body);
 
     const inquiry = await prisma.inquiry.create({
       data: {
-        name,
-        email,
-        subject,
-        message
+        name: validatedData.name,
+        email: validatedData.email,
+        subject: validatedData.subject,
+        message: validatedData.message
       }
     });
 
     return NextResponse.json(inquiry, { status: 201 });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Validation error', details: error.errors },
+        { status: 400 }
+      );
+    }
     console.error('Error creating inquiry:', error);
     return NextResponse.json(
       { error: 'Failed to create inquiry' },
