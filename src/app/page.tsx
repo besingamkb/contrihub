@@ -171,6 +171,119 @@ export default function Home() {
                 </div>
               </div>
             </div>
+
+            {/* Additional Team Members */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Team Member 1 */}
+              <div className="flex items-center">
+                <div className="relative w-24 h-24 mr-4">
+                  <Image
+                    src="/images/profiles/placeholder.jpg"
+                    alt="Marketing Director"
+                    fill
+                    className="rounded-full object-cover border-4 border-blue-500"
+                    sizes="(max-width: 96px) 100vw, 96px"
+                    priority
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/images/profiles/placeholder.jpg';
+                    }}
+                  />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Alex Rodriguez</h3>
+                  <p className="text-blue-600 font-medium">Marketing Director</p>
+                </div>
+              </div>
+
+              {/* Team Member 3 */}
+              <div className="flex items-center">
+                <div className="relative w-24 h-24 mr-4">
+                  <Image
+                    src="/images/profiles/team-3.jpg"
+                    alt="Lead Developer"
+                    fill
+                    className="rounded-full object-cover border-4 border-blue-500"
+                    sizes="(max-width: 96px) 100vw, 96px"
+                    priority
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/images/profiles/placeholder.jpg';
+                    }}
+                  />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">David Kim</h3>
+                  <p className="text-blue-600 font-medium">Lead Developer</p>
+                </div>
+              </div>
+
+              {/* Team Member 6 */}
+              <div className="flex items-center">
+                <div className="relative w-24 h-24 mr-4">
+                  <Image
+                    src="/images/profiles/team-6.jpg"
+                    alt="HR Manager"
+                    fill
+                    className="rounded-full object-cover border-4 border-blue-500"
+                    sizes="(max-width: 96px) 100vw, 96px"
+                    priority
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/images/profiles/placeholder.jpg';
+                    }}
+                  />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Rachel Chen</h3>
+                  <p className="text-blue-600 font-medium">HR Manager</p>
+                </div>
+              </div>
+
+              {/* Team Member 7 */}
+              <div className="flex items-center">
+                <div className="relative w-24 h-24 mr-4">
+                  <Image
+                    src="/images/profiles/team-7.jpg"
+                    alt="Project Manager"
+                    fill
+                    className="rounded-full object-cover border-4 border-blue-500"
+                    sizes="(max-width: 96px) 100vw, 96px"
+                    priority
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/images/profiles/placeholder.jpg';
+                    }}
+                  />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Marcus Brown</h3>
+                  <p className="text-blue-600 font-medium">Project Manager</p>
+                </div>
+              </div>
+
+              {/* Team Member 8 */}
+              <div className="flex items-center">
+                <div className="relative w-24 h-24 mr-4">
+                  <Image
+                    src="/images/profiles/team-8.jpg"
+                    alt="Data Analyst"
+                    fill
+                    className="rounded-full object-cover border-4 border-blue-500"
+                    sizes="(max-width: 96px) 100vw, 96px"
+                    priority
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = '/images/profiles/placeholder.jpg';
+                    }}
+                  />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Olivia Taylor</h3>
+                  <p className="text-blue-600 font-medium">Data Analyst</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
