@@ -15,7 +15,7 @@ export default function Sidebar() {
   return (
     <div className="flex flex-col h-full w-64 bg-white shadow-lg">
       <div className="flex items-center justify-center h-16 bg-indigo-600">
-        <h1 className="text-white text-xl font-bold">ContriHub</h1>
+        <h1 className="text-white text-xl font-bold">COFA Portal</h1>
       </div>
       <nav className="flex-1 px-2 py-4 space-y-1">
         {session?.user?.is_admin ? (

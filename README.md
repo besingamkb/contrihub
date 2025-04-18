@@ -1,6 +1,6 @@
-# ContriHub - Contribution Management System
+# ContriHub - Community Management System
 
-A modern web application built with Next.js 14 for managing member contributions and user administration.
+A modern web application built with Next.js 15 for managing community contributions, events, and user administration.
 
 ## Features
 
@@ -8,38 +8,50 @@ A modern web application built with Next.js 14 for managing member contributions
   - Member registration and profile management
   - Admin access control
   - User role management (Admin/Member)
+  - Secure authentication with NextAuth.js
 
 - **Contribution Tracking**
   - Monthly contribution records
-  - Contribution status tracking (PAID/PENDING)
+  - Contribution status tracking (PENDING/PAID/MISSED)
   - Contribution history view
-  - Contribution deletion with confirmation
+  - Contribution management
 
-- **Dashboard**
-  - Overview of all members
-  - Quick access to member details
-  - Contribution status at a glance
+- **Event Management**
+  - Calendar integration with FullCalendar
+  - Event creation and management
+  - Attendee tracking
+  - Event status management (PENDING/ACCEPTED/DECLINED/TENTATIVE)
+
+- **Contact System**
+  - Inquiry form handling
+  - Message management
+  - Admin response system
 
 - **Modern UI/UX**
-  - Responsive design
+  - Responsive design with Tailwind CSS
   - Interactive forms
   - Toast notifications
   - Confirmation modals
   - Loading states
+  - Beautiful calendar interface
 
 ## Tech Stack
 
 - **Frontend**
-  - Next.js 14
+  - Next.js 15.3.0
+  - React 19
   - TypeScript
-  - Tailwind CSS
+  - Tailwind CSS 4
   - Heroicons
-  - React Hook Form
+  - FullCalendar
+  - HeadlessUI
 
 - **Backend**
   - Next.js API Routes
   - Prisma ORM
   - PostgreSQL
+  - NextAuth.js
+  - Bcrypt for password hashing
 
 ## Getting Started
 
@@ -58,11 +70,14 @@ A modern web application built with Next.js 14 for managing member contributions
    Create a `.env` file in the root directory with the following variables:
    ```
    DATABASE_URL="your_database_url"
+   NEXTAUTH_SECRET="your_nextauth_secret"
+   NEXTAUTH_URL="http://localhost:3000"
    ```
 
-4. **Run database migrations**
+4. **Run database migrations and seed data**
    ```bash
-   npx prisma migrate dev
+   npm run migrate:fresh
+   npm run seed
    ```
 
 5. **Start the development server**
@@ -77,183 +92,87 @@ A modern web application built with Next.js 14 for managing member contributions
 
 ```
 contrihub/
-├── src/
-│   ├── app/
-│   │   ├── (dashboard)/
-│   │   │   ├── dashboard/
-│   │   │   │   ├── members/
-│   │   │   │   │   ├── [id]/
-│   │   │   │   │   │   ├── MemberDetails.tsx
-│   │   │   │   │   │   └── page.tsx
-│   │   │   │   │   ├── create/
-│   │   │   │   │   │   └── page.tsx
-│   │   │   │   │   └── page.tsx
-│   │   │   │   └── page.tsx
-│   │   ├── api/
-│   │   │   ├── users/
-│   │   │   │   ├── [id]/
-│   │   │   │   │   └── route.ts
-│   │   │   │   └── route.ts
-│   │   │   └── contributions/
-│   │   │       ├── [id]/
-│   │   │       │   └── route.ts
+├── app/
+│   ├── api/
+│   │   ├── auth/
+│   │   │   └── [...nextauth]/
 │   │   │       └── route.ts
-│   ├── components/
-│   │   ├── ConfirmationModal.tsx
-│   │   └── Toast.tsx
-│   └── lib/
-│       └── prisma.ts
+│   │   ├── contributions/
+│   │   │   └── route.ts
+│   │   ├── events/
+│   │   │   └── route.ts
+│   │   └── inquiries/
+│   │       └── route.ts
+│   ├── (auth)/
+│   │   ├── login/
+│   │   │   └── page.tsx
+│   │   └── register/
+│   │       └── page.tsx
+│   ├── (dashboard)/
+│   │   ├── contributions/
+│   │   │   └── page.tsx
+│   │   ├── events/
+│   │   │   └── page.tsx
+│   │   └── profile/
+│   │       └── page.tsx
+│   └── layout.tsx
 ├── prisma/
-│   └── schema.prisma
+│   ├── schema.prisma
+│   └── seed.ts
+├── public/
+│   └── images/
+├── src/
+│   ├── components/
+│   │   ├── ui/
+│   │   │   ├── button.tsx
+│   │   │   ├── input.tsx
+│   │   │   └── modal.tsx
+│   │   ├── forms/
+│   │   │   ├── contribution-form.tsx
+│   │   │   └── event-form.tsx
+│   │   └── layout/
+│   │       ├── header.tsx
+│   │       └── sidebar.tsx
+│   ├── lib/
+│   │   ├── auth.ts
+│   │   ├── db.ts
+│   │   └── utils.ts
+│   └── styles/
+│       └── globals.css
 ├── .env
+├── .env.local
 ├── .gitignore
+├── next.config.js
+├── next.config.ts
 ├── package.json
+├── postcss.config.mjs
+├── tsconfig.json
 └── README.md
 ```
 
-## API Endpoints
+## Database Schema
 
-### Users
-- `GET /api/users` - Get all users
-- `GET /api/users/[id]` - Get user by ID
-- `PUT /api/users/[id]` - Update user
-- `DELETE /api/users/[id]` - Delete user
+The application uses the following main models:
 
-### Contributions
-- `GET /api/contributions` - Get all contributions
-- `GET /api/contributions/[id]` - Get contribution by ID
-- `POST /api/contributions` - Create new contribution
-- `PUT /api/contributions/[id]` - Update contribution
-- `DELETE /api/contributions/[id]` - Delete contribution
+- **User**: Handles user accounts and authentication
+- **Contribution**: Tracks member contributions
+- **CalendarEvent**: Manages community events
+- **CalendarEventAttendee**: Tracks event attendance
+- **Inquiry**: Handles contact form submissions
 
 ## Available Commands
 
 ### Development
-- `npm run dev` - Start the development server with hot reloading
-  ```bash
-  npm run dev
-  ```
-  This command starts the Next.js development server on `http://localhost:3000` with hot reloading enabled.
-
-- `npm run build` - Build the application for production
-  ```bash
-  npm run build
-  ```
-  Creates an optimized production build of your application.
-
-- `npm run start` - Start the production server
-  ```bash
-  npm run start
-  ```
-  Runs the production build of your application.
-
-- `npm run lint` - Run ESLint to check for code quality issues
-  ```bash
-  npm run lint
-  ```
-  Checks your code for potential problems and style issues.
+- `npm run dev` - Start development server with Prisma generation
+- `npm run build` - Build for production with Prisma generation
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
 
 ### Database Management
-- `npx prisma generate` - Generate Prisma Client
-  ```bash
-  npx prisma generate
-  ```
-  Generates the Prisma Client based on your schema.
-
-- `npx prisma migrate dev` - Create and apply database migrations
-  ```bash
-  npx prisma migrate dev
-  ```
-  Creates a new migration and applies it to the database. Use this during development.
-
-- `npx prisma migrate reset --force` - Reset database and run seeder
-  ```bash
-  npx prisma migrate reset --force
-  ```
-  Completely resets the database, runs all migrations, and executes the seeder automatically. Perfect for getting a fresh database with test data.
-
-- `npx prisma db push` - Push schema changes to the database
-  ```bash
-  npx prisma db push
-  ```
-  Pushes the schema changes to the database without creating migrations.
-
-- `npx prisma studio` - Open Prisma Studio
-  ```bash
-  npx prisma studio
-  ```
-  Opens Prisma Studio, a visual database management tool.
-
-### TypeScript
-- `npm run type-check` - Run TypeScript type checking
-  ```bash
-  npm run type-check
-  ```
-  Checks your TypeScript code for type errors.
-
-- `npm run type-check:watch` - Run TypeScript type checking in watch mode
-  ```bash
-  npm run type-check:watch
-  ```
-  Continuously checks for TypeScript errors as you code.
-
-### Testing
-- `npm run test` - Run tests
-  ```bash
-  npm run test
-  ```
-  Runs all tests in the project.
-
-- `npm run test:watch` - Run tests in watch mode
-  ```bash
-  npm run test:watch
-  ```
-  Runs tests in watch mode, re-running when files change.
-
-### Code Quality
-- `npm run format` - Format code using Prettier
-  ```bash
-  npm run format
-  ```
-  Formats all code in the project according to Prettier rules.
-
-- `npm run format:check` - Check code formatting
-  ```bash
-  npm run format:check
-  ```
-  Checks if code is properly formatted without making changes.
-
-### Dependencies
-- `npm install` - Install dependencies
-  ```bash
-  npm install
-  ```
-  Installs all project dependencies.
-
-- `npm install <package>` - Install a new package
-  ```bash
-  npm install <package>
-  ```
-  Installs a new package and adds it to package.json.
-
-- `npm uninstall <package>` - Remove a package
-  ```bash
-  npm uninstall <package>
-  ```
-  Removes a package and its dependencies.
-
-### Cleanup
-- `npm run clean` - Clean build artifacts
-  ```bash
-  npm run clean
-  ```
-  Removes build artifacts and cache.
-
-- `npm cache clean` - Clean npm cache
-  ```bash
-  npm cache clean
-  ```
-  Cleans the npm cache to resolve potential installation issues.
+- `npm run migrate:fresh` - Reset database and run migrations
+- `npm run prisma:generate` - Generate Prisma client
+- `npm run seed` - Run database seeder
+- `npm run seed:all` - Reset, generate, and seed database
 
 ## Contributing
 
@@ -265,4 +184,4 @@ contrihub/
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
