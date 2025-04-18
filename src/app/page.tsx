@@ -124,7 +124,7 @@ export default function Home() {
               <div className="flex items-center">
                 <div className="relative w-32 h-32 mr-6">
                   <Image
-                    src="/images/profiles/vp-ops.jpg"
+                    src="/images/profiles/dev-manager.jpg"
                     alt="VP Operations"
                     fill
                     className="rounded-full object-cover border-4 border-blue-500"
@@ -158,7 +158,7 @@ export default function Home() {
               <div className="flex items-center">
                 <div className="relative w-32 h-32 mr-6">
                   <Image
-                    src="/images/profiles/vp-finance.jpg"
+                    src="/images/profiles/finance-manager.jpg"
                     alt="VP Finance"
                     fill
                     className="rounded-full object-cover border-4 border-blue-500"
