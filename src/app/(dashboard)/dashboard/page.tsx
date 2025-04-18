@@ -22,6 +22,13 @@ interface RecentContribution {
   status: string
 }
 
+interface UserSession {
+  id: string
+  email: string
+  name: string
+  is_admin: boolean
+}
+
 export default function DashboardPage() {
   const router = useRouter()
   const { data: session, status } = useSession()
@@ -39,7 +46,7 @@ export default function DashboardPage() {
     }
 
     // Check if user is not an admin and redirect to profile
-    const user = session.user as { id: string; email: string; name: string; is_admin: boolean }
+    const user = session.user as UserSession
     if (!user.is_admin) {
       router.push('/dashboard/profile')
       return
@@ -48,17 +55,15 @@ export default function DashboardPage() {
     const fetchDashboardData = async () => {
       try {
         setLoading(true)
-        const response = await fetch('/api/dashboard')
-        console.log('API Response:', response)
+        setError(null)
         
+        const response = await fetch('/api/dashboard')
         if (!response.ok) {
           const errorData = await response.json()
           throw new Error(errorData.error || 'Failed to fetch dashboard data')
         }
         
         const data = await response.json()
-        console.log('Dashboard Data:', data)
-        
         setStats(data.stats)
         setRecentContributions(data.recentContributions)
       } catch (error) {

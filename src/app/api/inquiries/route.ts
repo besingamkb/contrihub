@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '../auth/[...nextauth]/route';
 
 // Rate limiting configuration
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute in milliseconds
@@ -16,25 +18,42 @@ const inquirySchema = z.object({
 
 export async function GET() {
   try {
-    const inquiries = await prisma.inquiry.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        subject: true,
-        message: true,
-        created_at: true,
-        updated_at: true
-      },
-      orderBy: {
-        created_at: 'desc'
-      }
-    });
-    return NextResponse.json(inquiries);
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    try {
+      const inquiries = await prisma.inquiry.findMany({
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          subject: true,
+          message: true,
+          created_at: true,
+          updated_at: true
+        },
+        orderBy: {
+          created_at: 'desc'
+        }
+      });
+      return NextResponse.json(inquiries);
+    } catch (dbError) {
+      console.error('Database Error:', dbError);
+      return NextResponse.json(
+        { error: 'Failed to fetch inquiries' },
+        { status: 500 }
+      );
+    }
   } catch (error) {
-    console.error('Error fetching inquiries:', error);
+    console.error('Inquiries API Error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch inquiries' },
+      { error: error instanceof Error ? error.message : "Internal server error" },
       { status: 500 }
     );
   }
@@ -76,29 +95,37 @@ export async function POST(request: Request) {
       submissionTimes.set(ip, { count: 1, timestamp: now });
     }
 
-    const body = await request.json();
-    const validatedData = inquirySchema.parse(body);
+    try {
+      const body = await request.json();
+      const validatedData = inquirySchema.parse(body);
 
-    const inquiry = await prisma.inquiry.create({
-      data: {
-        name: validatedData.name,
-        email: validatedData.email,
-        subject: validatedData.subject,
-        message: validatedData.message
+      const inquiry = await prisma.inquiry.create({
+        data: {
+          name: validatedData.name,
+          email: validatedData.email,
+          subject: validatedData.subject,
+          message: validatedData.message
+        }
+      });
+
+      return NextResponse.json(inquiry, { status: 201 });
+    } catch (dbError) {
+      if (dbError instanceof z.ZodError) {
+        return NextResponse.json(
+          { error: 'Validation error', details: dbError.errors },
+          { status: 400 }
+        );
       }
-    });
-
-    return NextResponse.json(inquiry, { status: 201 });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
+      console.error('Database Error:', dbError);
       return NextResponse.json(
-        { error: 'Validation error', details: error.errors },
-        { status: 400 }
+        { error: 'Failed to create inquiry' },
+        { status: 500 }
       );
     }
-    console.error('Error creating inquiry:', error);
+  } catch (error) {
+    console.error('Inquiries API Error:', error);
     return NextResponse.json(
-      { error: 'Failed to create inquiry' },
+      { error: error instanceof Error ? error.message : "Internal server error" },
       { status: 500 }
     );
   }

@@ -1,14 +1,15 @@
 import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
-import { Status, Prisma } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '../../auth/[...nextauth]/route'
 
 type ContributionWithUser = {
   id: number
   user_id: number
-  amount: Prisma.Decimal
+  amount: number
   month: string
   year: number
-  status: Status
+  status: 'PENDING' | 'PAID' | 'MISSED'
   notes: string | null
   created_at: Date
   updated_at: Date
@@ -16,74 +17,90 @@ type ContributionWithUser = {
     id: number
     name: string
     email: string
-    [key: string]: any
   }
 }
 
 export async function GET(request: Request) {
   try {
-    const contributions = await prisma.contribution.findMany({
-      include: {
-        user: true
-      }
-    }) as unknown as ContributionWithUser[]
-
-    type GroupKey = string
-    type GroupedData = {
-      year: number
-      month: string
-      total: number
-      totalPending: number
-      contributions: ContributionWithUser[]
+    const session = await getServerSession(authOptions)
+    
+    if (!session?.user) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      )
     }
 
-    // Group contributions by month and year
-    const groupedContributions = contributions.reduce<Record<GroupKey, GroupedData>>((acc, contribution) => {
-      const key = `${contribution.year}-${contribution.month}`
-      
-      if (!acc[key]) {
-        acc[key] = {
-          year: contribution.year,
-          month: contribution.month,
-          total: 0,
-          totalPending: 0,
-          contributions: []
+    try {
+      const contributions = await prisma.contribution.findMany({
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              email: true
+            }
+          }
         }
+      }) as unknown as ContributionWithUser[]
+
+      type GroupKey = string
+      type GroupedData = {
+        year: number
+        month: string
+        total: number
+        totalPending: number
+        paidMembers: number
+        contributions: ContributionWithUser[]
       }
 
-      const amount = Number(contribution.amount)
-      acc[key].total += amount
-      if (contribution.status === Status.PENDING) {
-        acc[key].totalPending += amount
-      }
-      acc[key].contributions.push(contribution)
+      // Group contributions by month and year
+      const groupedContributions = contributions.reduce<Record<GroupKey, GroupedData>>((acc, contribution) => {
+        const key = `${contribution.year}-${contribution.month}`
+        
+        if (!acc[key]) {
+          acc[key] = {
+            year: contribution.year,
+            month: contribution.month,
+            total: 0,
+            totalPending: 0,
+            paidMembers: 0,
+            contributions: []
+          }
+        }
 
-      return acc
-    }, {})
+        acc[key].total += Number(contribution.amount)
+        if (contribution.status === 'PENDING') {
+          acc[key].totalPending += Number(contribution.amount)
+        }
+        if (contribution.status === 'PAID') {
+          acc[key].paidMembers += 1
+        }
+        acc[key].contributions.push(contribution)
 
-    // Convert the grouped object to an array and sort by year and month
-    const result = Object.values(groupedContributions).sort((a, b) => {
-      if (a.year !== b.year) {
-        return b.year - a.year
-      }
-      return b.month.localeCompare(a.month)
-    })
+        return acc
+      }, {})
 
-    // Format the response to ensure all amounts are numbers and calculate paid members
-    const formattedResult = result.map(group => ({
-      ...group,
-      contributions: group.contributions.map(contribution => ({
-        ...contribution,
-        amount: Number(contribution.amount)
-      })),
-      paidMembers: group.contributions.filter(c => c.status === Status.PAID).length
-    }))
+      // Convert to array and sort by year and month
+      const result = Object.values(groupedContributions).sort((a, b) => {
+        if (a.year !== b.year) {
+          return b.year - a.year
+        }
+        return b.month.localeCompare(a.month)
+      })
 
-    return NextResponse.json(formattedResult)
+      return NextResponse.json(result)
+    } catch (dbError) {
+      console.error('Database Error:', dbError)
+      return NextResponse.json(
+        { error: 'Failed to fetch grouped contributions' },
+        { status: 500 }
+      )
+    }
   } catch (error) {
-    console.error('Error fetching grouped contributions:', error)
+    console.error('Error:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch grouped contributions' },
+      { error: 'Internal server error' },
       { status: 500 }
     )
   }

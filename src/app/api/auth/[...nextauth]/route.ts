@@ -2,7 +2,7 @@ import NextAuth from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcrypt"
-import prisma from "@/lib/prisma"
+import { prisma } from "@/lib/prisma"
 import { NextAuthOptions } from "next-auth"
 import { Adapter } from "next-auth/adapters"
 
@@ -60,11 +60,14 @@ export const authOptions: NextAuthOptions = {
       return token
     },
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id as string
-        session.user.is_admin = token.is_admin as boolean
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.id as string,
+          is_admin: token.is_admin as boolean
+        }
       }
-      return session
     }
   }
 }

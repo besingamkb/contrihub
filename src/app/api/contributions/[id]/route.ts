@@ -1,11 +1,18 @@
 import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
+import { prisma } from '@/lib/prisma'
 
 export async function DELETE(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
+    if (!params?.id) {
+      return NextResponse.json(
+        { error: 'Contribution ID is required' },
+        { status: 400 }
+      )
+    }
+
     const contributionId = parseInt(params.id)
     if (isNaN(contributionId)) {
       return NextResponse.json(
@@ -14,8 +21,20 @@ export async function DELETE(
       )
     }
 
+    // Check if contribution exists before deleting
+    const existingContribution = await prisma.contribution.findUnique({
+      where: { id: contributionId }
+    })
+
+    if (!existingContribution) {
+      return NextResponse.json(
+        { error: 'Contribution not found' },
+        { status: 404 }
+      )
+    }
+
     // Delete the contribution
-    const contribution = await prisma.contribution.delete({
+    await prisma.contribution.delete({
       where: { id: contributionId }
     })
 

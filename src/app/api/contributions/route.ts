@@ -1,5 +1,21 @@
 import { NextResponse } from 'next/server'
-import prisma from '@/lib/prisma'
+import { prisma } from '@/lib/prisma'
+
+type Contribution = {
+  id: number
+  user_id: number
+  amount: number
+  month: string
+  year: number
+  status: 'PENDING' | 'PAID' | 'MISSED'
+  notes: string | null
+  created_at: Date
+  updated_at: Date
+  user: {
+    name: string
+    email: string
+  }
+}
 
 export async function GET(request: Request) {
   try {
@@ -45,10 +61,10 @@ export async function GET(request: Request) {
           }
         }
       }
-    })
+    }) as unknown as Contribution[]
 
     // Convert Decimal to number for the response
-    const formattedContributions = contributions.map(contribution => ({
+    const formattedContributions = contributions.map((contribution: Contribution) => ({
       ...contribution,
       amount: Number(contribution.amount)
     }))
