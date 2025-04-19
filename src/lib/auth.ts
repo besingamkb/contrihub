@@ -1,15 +1,18 @@
-import { NextAuthOptions } from 'next-auth'
-import CredentialsProvider from 'next-auth/providers/credentials'
-import { prisma } from './prisma'
-import { compare } from 'bcryptjs'
+import { PrismaAdapter } from "@auth/prisma-adapter"
+import CredentialsProvider from "next-auth/providers/credentials"
+import bcrypt from "bcrypt"
+import { prisma } from "@/lib/prisma"
+import { NextAuthOptions } from "next-auth"
+import { Adapter } from "next-auth/adapters"
 
 export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma) as Adapter,
   providers: [
     CredentialsProvider({
-      name: 'Credentials',
+      name: "credentials",
       credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' }
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
@@ -17,18 +20,16 @@ export const authOptions: NextAuthOptions = {
         }
 
         const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email
-          }
+          where: { email: credentials.email }
         })
 
         if (!user || !user.password) {
           throw new Error('Invalid credentials')
         }
 
-        const isPasswordValid = await compare(credentials.password, user.password)
+        const isValid = await bcrypt.compare(credentials.password, user.password)
 
-        if (!isPasswordValid) {
+        if (!isValid) {
           throw new Error('Invalid credentials')
         }
 
@@ -42,11 +43,12 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   session: {
-    strategy: 'jwt',
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    strategy: "jwt",
+    maxAge: 8 * 60 * 60, // 8 hours
   },
   pages: {
-    signIn: '/login'
+    signIn: '/login',
+    error: '/auth/error',
   },
   callbacks: {
     async jwt({ token, user }) {
@@ -57,13 +59,14 @@ export const authOptions: NextAuthOptions = {
       return token
     },
     async session({ session, token }) {
-      if (token) {
-        session.user.id = token.id
-        session.user.is_admin = token.is_admin
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.id as string,
+          is_admin: token.is_admin as boolean
+        }
       }
-      return session
     }
-  },
-  secret: process.env.NEXTAUTH_SECRET,
-  debug: process.env.NODE_ENV === 'development'
+  }
 } 

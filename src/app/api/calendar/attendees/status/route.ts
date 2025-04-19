@@ -1,22 +1,31 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '../../../../auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { UpdateAttendeeStatusInput } from '@/types/calendar';
 
-export async function PUT(
-  request: Request,
-  { params }: { params: { id: string; userId: string } }
-) {
+export async function PUT(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    const { eventId, userId, status } = await req.json() as UpdateAttendeeStatusInput & { eventId: string; userId: string };
+
+    if (userId !== session.user.id) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
     }
 
     const event = await prisma.calendarEvent.findUnique({
       where: {
-        id: parseInt(params.id),
+        id: parseInt(eventId),
       },
       include: {
         attendees: true,
@@ -28,8 +37,13 @@ export async function PUT(
     }
 
     // Check if the user is an attendee
+    type CalendarEventAttendee = {
+      id: number;
+      user_id: number;
+    };
+
     const attendee = event.attendees.find(
-      (a) => a.user_id === parseInt(params.userId)
+      (attendee: CalendarEventAttendee) => attendee.user_id === parseInt(userId)
     );
 
     if (!attendee) {
@@ -38,14 +52,6 @@ export async function PUT(
         { status: 400 }
       );
     }
-
-    // Only allow users to update their own status
-    if (parseInt(params.userId) !== session.user.id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-
-    const body: UpdateAttendeeStatusInput = await request.json();
-    const { status } = body;
 
     const updatedAttendee = await prisma.calendarEventAttendee.update({
       where: {
