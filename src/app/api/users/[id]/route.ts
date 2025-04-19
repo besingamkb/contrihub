@@ -1,19 +1,20 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '../../auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth'
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Get the session with the correct options
     const session = await getServerSession(authOptions)
+    const id = (await params).id;
     
     // Log the session for debugging
     console.log('Session:', JSON.stringify(session, null, 2))
-    console.log('Params ID:', params.id)
+    console.log('Params ID:', id)
 
     // Check if session exists and has user
     if (!session?.user?.id) {
@@ -25,7 +26,7 @@ export async function GET(
     }
 
     // Parse the user ID from params
-    const userId = parseInt(params.id)
+    const userId = parseInt(id)
     if (isNaN(userId)) {
       console.log('Invalid user ID format')
       return NextResponse.json(
@@ -95,10 +96,11 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userId = parseInt(params.id)
+    const id = (await params).id;
+    const userId = parseInt(id)
     if (isNaN(userId)) {
       return NextResponse.json(
         { error: 'Invalid user ID' },
@@ -154,10 +156,11 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userId = parseInt(params.id)
+    const id = (await params).id;
+    const userId = parseInt(id)
     if (isNaN(userId)) {
       return NextResponse.json(
         { error: 'Invalid user ID' },

@@ -4,14 +4,14 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 interface FormData {
-  fullname: string
+  name: string
   email: string
   password: string
   is_admin: boolean
 }
 
 interface FormErrors {
-  fullname?: string
+  name?: string
   email?: string
   password?: string
 }
@@ -19,7 +19,7 @@ interface FormErrors {
 export default function CreateMemberPage() {
   const router = useRouter()
   const [formData, setFormData] = useState<FormData>({
-    fullname: '',
+    name: '',
     email: '',
     password: '',
     is_admin: false
@@ -31,11 +31,11 @@ export default function CreateMemberPage() {
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
 
-    // Fullname validation
-    if (!formData.fullname.trim()) {
-      newErrors.fullname = 'Full name is required'
-    } else if (formData.fullname.length < 3) {
-      newErrors.fullname = 'Full name must be at least 3 characters'
+    // Name validation
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required'
+    } else if (formData.name.length < 3) {
+      newErrors.name = 'Name must be at least 3 characters'
     }
 
     // Email validation
@@ -72,7 +72,7 @@ export default function CreateMemberPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          fullname: formData.fullname,
+          name: formData.name,
           email: formData.email,
           password: formData.password,
           is_admin: formData.is_admin
@@ -131,8 +131,8 @@ export default function CreateMemberPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="fullname" className="block text-sm font-medium text-gray-700">
-                    Full Name
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                    Name
                   </label>
                   <div className="mt-1 relative rounded-md shadow-sm">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -142,18 +142,18 @@ export default function CreateMemberPage() {
                     </div>
                     <input
                       type="text"
-                      id="fullname"
-                      name="fullname"
-                      value={formData.fullname}
+                      id="name"
+                      name="name"
+                      value={formData.name}
                       onChange={handleChange}
                       className={`block w-full pl-10 pr-3 py-2 border ${
-                        errors.fullname ? 'border-red-300' : 'border-gray-300'
+                        errors.name ? 'border-red-300' : 'border-gray-300'
                       } rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm`}
                       placeholder="John Doe"
                     />
                   </div>
-                  {errors.fullname && (
-                    <p className="mt-2 text-sm text-red-600">{errors.fullname}</p>
+                  {errors.name && (
+                    <p className="mt-2 text-sm text-red-600">{errors.name}</p>
                   )}
                 </div>
 

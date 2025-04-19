@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
+import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { UpdateCalendarEventInput } from '@/types/calendar';
+import { AttendeeStatus } from '@prisma/client';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,9 +15,10 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const id = (await params).id;
     const event = await prisma.calendarEvent.findUnique({
       where: {
-        id: parseInt(params.id),
+        id: parseInt(id),
       },
       include: {
         attendees: {
@@ -56,7 +58,7 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -64,9 +66,10 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const id = (await params).id;
     const event = await prisma.calendarEvent.findUnique({
       where: {
-        id: parseInt(params.id),
+        id: parseInt(id),
       },
     });
 
@@ -74,41 +77,52 @@ export async function PUT(
       return NextResponse.json({ error: 'Event not found' }, { status: 404 });
     }
 
-    if (event.created_by !== session.user.id) {
+    if (event.created_by !== parseInt(session.user.id)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const body: UpdateCalendarEventInput = await request.json();
     const { title, description, start_time, end_time, location, attendeeIds } = body;
 
+    const updateData: any = {
+      title,
+      description,
+      start_time: start_time ? new Date(start_time) : undefined,
+      end_time: end_time ? new Date(end_time) : undefined,
+      location,
+    };
+
+    if (attendeeIds) {
+      updateData.attendees = {
+        deleteMany: {},
+        create: [
+          // Creator is always an attendee
+          {
+            user: {
+              connect: {
+                id: parseInt(session.user.id),
+              },
+            },
+            status: AttendeeStatus.ACCEPTED,
+          },
+          // Add other attendees
+          ...attendeeIds.map((userId) => ({
+            user: {
+              connect: {
+                id: userId,
+              },
+            },
+            status: AttendeeStatus.PENDING,
+          })),
+        ],
+      };
+    }
+
     const updatedEvent = await prisma.calendarEvent.update({
       where: {
-        id: parseInt(params.id),
+        id: parseInt(id),
       },
-      data: {
-        title,
-        description,
-        start_time: start_time ? new Date(start_time) : undefined,
-        end_time: end_time ? new Date(end_time) : undefined,
-        location,
-        ...(attendeeIds && {
-          attendees: {
-            deleteMany: {},
-            create: [
-              // Creator is always an attendee
-              {
-                user_id: session.user.id,
-                status: 'ACCEPTED',
-              },
-              // Add other attendees
-              ...attendeeIds.map((userId) => ({
-                user_id: userId,
-                status: 'PENDING',
-              })),
-            ],
-          },
-        }),
-      },
+      data: updateData,
       include: {
         attendees: {
           include: {
@@ -143,7 +157,7 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -151,9 +165,10 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const id = (await params).id;
     const event = await prisma.calendarEvent.findUnique({
       where: {
-        id: parseInt(params.id),
+        id: parseInt(id),
       },
     });
 
@@ -161,13 +176,13 @@ export async function DELETE(
       return NextResponse.json({ error: 'Event not found' }, { status: 404 });
     }
 
-    if (event.created_by !== session.user.id) {
+    if (event.created_by !== parseInt(session.user.id)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     await prisma.calendarEvent.delete({
       where: {
-        id: parseInt(params.id),
+        id: parseInt(id),
       },
     });
 

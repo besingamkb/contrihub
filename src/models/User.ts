@@ -1,9 +1,10 @@
 import { BaseModel } from './BaseModel';
 import { hash, compare } from 'bcrypt';
+import { Prisma } from '@prisma/client';
 
 type User = {
   id: number;
-  fullname: string;
+  name: string;
   email: string;
   password: string;
   is_admin: boolean;
@@ -12,7 +13,7 @@ type User = {
 };
 
 type UserCreateInput = {
-  fullname: string;
+  name: string;
   email: string;
   password: string;
   is_admin?: boolean;
@@ -26,7 +27,10 @@ export class UserModel extends BaseModel<User, UserCreateInput, UserUpdateInput>
   }
 
   async findByEmail(email: string): Promise<User | null> {
-    return this.getPrismaModel().findUnique({
+    const model = this.prisma[this.modelName] as unknown as {
+      findUnique: (args: { where: { email: string } }) => Promise<User | null>;
+    };
+    return model.findUnique({
       where: { email },
     });
   }
@@ -54,12 +58,15 @@ export class UserModel extends BaseModel<User, UserCreateInput, UserUpdateInput>
   }
 
   // Query builder methods
-  async where(field: keyof User, value: any) {
-    return this.findMany({ [field]: value });
+  async where(field: keyof User, value: string | number | boolean | Date) {
+    return this.findMany({ [field]: value } as Prisma.JsonObject);
   }
 
-  async orderBy(field: keyof User, order: 'asc' | 'desc' = 'asc') {
-    return this.getPrismaModel().findMany({
+  async orderBy(field: keyof User, order: Prisma.SortOrder = 'asc') {
+    const model = this.prisma[this.modelName] as unknown as {
+      findMany: (args: { orderBy: { [key: string]: Prisma.SortOrder } }) => Promise<User[]>;
+    };
+    return model.findMany({
       orderBy: { [field]: order },
     });
   }

@@ -6,7 +6,7 @@ import { UpdateAttendeeStatusInput } from '@/types/calendar';
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string; userId: string } }
+  { params }: { params: Promise<{ id: string; userId: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,9 +14,10 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id, userId } = await params;
     const event = await prisma.calendarEvent.findUnique({
       where: {
-        id: parseInt(params.id),
+        id: parseInt(id),
       },
       include: {
         attendees: true,
@@ -27,9 +28,10 @@ export async function PUT(
       return NextResponse.json({ error: 'Event not found' }, { status: 404 });
     }
 
+    const userIdNum = parseInt(userId);
     // Check if the user is an attendee
     const attendee = event.attendees.find(
-      (a) => a.user_id === parseInt(params.userId)
+      (a) => a.user_id === userIdNum
     );
 
     if (!attendee) {
@@ -40,7 +42,7 @@ export async function PUT(
     }
 
     // Only allow users to update their own status
-    if (parseInt(params.userId) !== session.user.id) {
+    if (userIdNum !== parseInt(session.user.id)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

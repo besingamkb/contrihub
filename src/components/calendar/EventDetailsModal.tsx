@@ -128,9 +128,11 @@ export default function EventDetailsModal({ isOpen, onClose, event, onDelete }: 
                       <p className="text-sm text-gray-500">Attendees</p>
                       <div className="mt-1 max-h-40 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
                         {event.attendees.map((attendee) => (
-                          <div key={attendee.user.id} className="flex items-center space-x-2 py-1">
-                            {getStatusIcon(attendee.status)}
-                            <p className="text-sm text-gray-900">{attendee.user.name}</p>
+                          <div key={attendee.user.id} className="flex items-center py-1">
+                            <div className="flex items-center space-x-2">
+                              {getStatusIcon(attendee.status)}
+                              <p className="text-sm text-gray-900">{attendee.user.name}</p>
+                            </div>
                           </div>
                         ))}
                       </div>
