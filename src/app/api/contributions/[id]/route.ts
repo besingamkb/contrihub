@@ -3,17 +3,18 @@ import { prisma } from '@/lib/prisma'
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    if (!params?.id) {
+    const id = (await params).id;
+    if (!id) {
       return NextResponse.json(
         { error: 'Contribution ID is required' },
         { status: 400 }
       )
     }
 
-    const contributionId = parseInt(params.id)
+    const contributionId = parseInt(id)
     if (isNaN(contributionId)) {
       return NextResponse.json(
         { error: 'Invalid contribution ID' },
