@@ -35,6 +35,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <main className="p-6">
           {children}
         </main>
+        <div className="p-6 text-center text-gray-500 text-sm">
+          Made with ❤️ by <a href="https://mks4bsoftware.com/" target="_blank" rel="noopener noreferrer" className="hover:text-gray-700">@mks4bsoftware</a>
+        </div>
       </div>
     </div>
   )
