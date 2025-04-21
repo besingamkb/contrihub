@@ -81,6 +81,7 @@ export default function Footer() {
         </div>
         <div className="mt-8 pt-8 border-t border-gray-800 text-left text-gray-400">
           <p>&copy; {new Date().getFullYear()} COFA. All rights reserved.</p>
+          <p className="mt-2">Made with ❤️ by <a href="https://mks4bsoftware.com/" target="_blank" rel="noopener noreferrer" className="hover:text-white">@mks4bsoftware</a></p>
         </div>
       </div>
     </footer>
